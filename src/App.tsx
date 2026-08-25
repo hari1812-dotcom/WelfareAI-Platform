@@ -1,0 +1,42 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LandingPage } from '@/pages/LandingPage';
+import { LoginPage } from '@/pages/LoginPage';
+import { RegisterPage } from '@/pages/RegisterPage';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { FindSchemesPage } from '@/pages/FindSchemesPage';
+import { SchemeDetailsPage } from '@/pages/SchemeDetailsPage';
+import { ApplicationsPage } from '@/pages/ApplicationsPage';
+import { BenefitsPage } from '@/pages/BenefitsPage';
+import { DocumentsPage } from '@/pages/DocumentsPage';
+import { AIAssistantPage } from '@/pages/AIAssistantPage';
+import { WhatIfPage } from '@/pages/WhatIfPage';
+import { ComparePage } from '@/pages/ComparePage';
+import { AdminPage } from '@/pages/AdminPage';
+import { FeedbackPage } from '@/pages/FeedbackPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/schemes" element={<FindSchemesPage />} />
+        <Route path="/schemes/:id" element={<SchemeDetailsPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/applications" element={<ApplicationsPage />} />
+        <Route path="/benefits" element={<BenefitsPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/assistant" element={<AIAssistantPage />} />
+        <Route path="/what-if" element={<WhatIfPage />} />
+        <Route path="/compare" element={<ComparePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
