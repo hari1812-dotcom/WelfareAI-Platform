@@ -1,0 +1,85 @@
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+
+const citizenSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      required: [true, 'Full name is required'],
+      trim: true,
+      maxlength: 120,
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
+    },
+    mobile: {
+      type: String,
+      required: [true, 'Mobile number is required'],
+      trim: true,
+    },
+    state: {
+      type: String,
+      required: [true, 'State is required'],
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+      minlength: 6,
+      select: false,
+    },
+    language: {
+      type: String,
+      default: 'English',
+      trim: true,
+    },
+    age: {
+      type: Number,
+      min: 0,
+      max: 120,
+    },
+    occupation: {
+      type: String,
+      trim: true,
+    },
+    income: {
+      type: String,
+      trim: true,
+    },
+    aadharNumber: {
+      type: String,
+      trim: true,
+      match: [/^\d{12}$/, 'Please enter a valid 12-digit Aadhar number'],
+    },
+    rationCard: {
+      type: String,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform(_doc, ret) {
+        delete ret.password;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  }
+);
+
+citizenSchema.pre('save', async function hashPassword() {
+  if (!this.isModified('password')) return;
+  this.password = await bcrypt.hash(this.password, 12);
+});
+
+citizenSchema.methods.comparePassword = function comparePassword(candidate) {
+  return bcrypt.compare(candidate, this.password);
+};
+
+export const Citizen = mongoose.model('Citizen', citizenSchema);
