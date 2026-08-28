@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+  body { @apply bg-gray-50 text-navy-900 font-sans; line-height: 1.6; background-image: radial-gradient(circle at 85% 0%, rgb(185 163 248 / 0.14), transparent 28rem); }
+  h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight; line-height: 1.2; }
+  *:focus-visible { @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white rounded-md; }
+}
+
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .card-base { @apply rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-200; }
+  .card-hover { @apply hover:shadow-card-hover hover:border-primary-300; }
+  .input-base { @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-navy-900 placeholder-gray-400 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-200; }
+  .label-base { @apply mb-1.5 block text-sm font-semibold text-navy-800; }
+  .nav-link { @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white; }
+  .nav-link-active { @apply bg-primary-500 text-white shadow-soft; }
+  .ai-gradient { background: linear-gradient(135deg, #EA67C4, #874DF4, #4330F5); }
+  .ai-glow { box-shadow: 0 12px 34px rgb(135 77 244 / 0.22); }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; background-clip: content-box; }
