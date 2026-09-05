@@ -372,15 +372,24 @@ const resources = {
   }
 };
 
+const savedLanguage = typeof window !== 'undefined' ? (localStorage.getItem('userLanguage') || localStorage.getItem('i18nextLng') || 'English') : 'English';
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "English", 
+    lng: savedLanguage, 
     fallbackLng: "English",
     interpolation: {
       escapeValue: false 
     }
   });
+
+i18n.on('languageChanged', (lng) => {
+  if (typeof window !== 'undefined' && lng) {
+    localStorage.setItem('userLanguage', lng);
+    localStorage.setItem('i18nextLng', lng);
+  }
+});
 
 export default i18n;

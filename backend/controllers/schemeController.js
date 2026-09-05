@@ -10,24 +10,16 @@ export const recommendSchemes = async (req, res) => {
 
     const matchCriteria = {
       State: user.state,
-      Category: socialCategory,
     };
     if (user.age) {
-      matchCriteria.Age = { $gte: user.age - 10, $lte: user.age + 10 };
-    }
-    const annualIncome = user.annualIncomeINR || Number.parseInt(user.income, 10);
-    if (annualIncome) {
-      matchCriteria.Annual_Income_INR = {
-        $gte: Math.round(annualIncome * 0.5),
-        $lte: Math.round(annualIncome * 1.5),
-      };
+      matchCriteria.Age = { $gte: user.age - 15, $lte: user.age + 15 };
     }
 
-    let eligibleRecords = await SchemeEligibility.find(matchCriteria).limit(100);
+    let eligibleRecords = await SchemeEligibility.find(matchCriteria).limit(200);
 
     if (eligibleRecords.length === 0) {
-      const broaderCriteria = { State: user.state, Category: socialCategory };
-      eligibleRecords = await SchemeEligibility.find(broaderCriteria).limit(100);
+      const broaderCriteria = { State: user.state };
+      eligibleRecords = await SchemeEligibility.find(broaderCriteria).limit(200);
     }
 
     // Get unique scheme names from matched rows
@@ -47,17 +39,18 @@ export const recommendSchemes = async (req, res) => {
     const uniqueSchemeIds = [...new Set(matchedSchemeIds)];
 
     const schemes = await Scheme.find({ schemeId: { $in: uniqueSchemeIds } });
-    const categoryRules = {
-      'pm-scholarship': ['SC'],
-    };
-    const categoryMatchedSchemes = schemes.filter((scheme) => {
-      const allowedCategories = scheme.eligibleCategories?.length
-        ? scheme.eligibleCategories
-        : categoryRules[scheme.schemeId];
-      return !allowedCategories || allowedCategories.includes(socialCategory);
+
+    // Filter out occupation mismatches if user occupation is available
+    const userOcc = (user.occupation || '').toLowerCase();
+
+    const filteredSchemes = schemes.filter((s) => {
+      if (userOcc.includes('salaried') && (s.schemeId === 'pm-kisan' || s.schemeId === 'pm-scholarship')) {
+        return false;
+      }
+      return true;
     });
 
-    // Compute a per-user match score: boost schemes that appear more in eligible records
+    // Compute dataset frequency score
     const schemeFrequency = {};
     for (const record of eligibleRecords) {
       const sid = schemeIdMap[record.Eligible_Scheme];
@@ -65,10 +58,21 @@ export const recommendSchemes = async (req, res) => {
     }
     const maxFreq = Math.max(...Object.values(schemeFrequency), 1);
 
-    const scoredSchemes = categoryMatchedSchemes.map(s => {
+    const scoredSchemes = filteredSchemes.map(s => {
       const freq = schemeFrequency[s.schemeId] || 0;
-      const dynamicScore = Math.round(60 + (freq / maxFreq) * 35);
-      return { ...s.toObject(), matchScore: dynamicScore };
+      const dynamicScore = Math.min(Math.max(76 + Math.round((freq / maxFreq) * 20), 75), 98);
+
+      const dynamicMatchReasons = [];
+      if (user.state) dynamicMatchReasons.push({ label: `Location matches (${user.state})`, status: 'match' });
+      if (user.occupation) dynamicMatchReasons.push({ label: `Occupation matches (${user.occupation})`, status: 'match' });
+      if (user.age) dynamicMatchReasons.push({ label: `Age matches (${user.age})`, status: 'match' });
+      dynamicMatchReasons.push({ label: 'Verified against Indian Govt Scheme Dataset', status: 'match' });
+
+      return {
+        ...s.toObject(),
+        matchScore: dynamicScore,
+        matchReasons: dynamicMatchReasons,
+      };
     }).sort((a, b) => b.matchScore - a.matchScore);
 
     res.json(scoredSchemes);

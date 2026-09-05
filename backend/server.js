@@ -6,6 +6,7 @@ import citizenRoutes from './routes/citizenRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import schemeRoutes from './routes/schemeRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +22,7 @@ app.use('/api/citizens', citizenRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/schemes', schemeRoutes);
+app.use('/api/documents', documentRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ message: 'Route not found' });

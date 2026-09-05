@@ -1,12 +1,19 @@
 const API_BASE = '/api';
 
 async function request(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
+  const headers = {
+    Authorization: localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : undefined,
+    ...options.headers,
+  };
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  } else {
+    delete headers['Content-Type'];
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : undefined,
-      ...options.headers,
-    },
+    headers,
     ...options,
   });
 
@@ -62,3 +69,33 @@ export function getRecommendedSchemes() {
 export function getAllSchemes() {
   return request('/schemes');
 }
+
+export function getDocumentsApi() {
+  return request('/documents');
+}
+
+export function uploadDocumentApi(formData) {
+  return request('/documents', {
+    method: 'POST',
+    body: formData,
+  });
+}
+
+export function updateDocumentApi(id, formData) {
+  return request(`/documents/${id}`, {
+    method: 'PUT',
+    body: formData,
+  });
+}
+
+export function deleteDocumentApi(id) {
+  return request(`/documents/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export function getDocumentFileUrl(id, download = false) {
+  const token = localStorage.getItem('token');
+  return `${API_BASE}/documents/${id}/file?download=${download}${token ? `&token=${token}` : ''}`;
+}
+

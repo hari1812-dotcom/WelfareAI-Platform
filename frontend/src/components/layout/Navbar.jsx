@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -8,13 +8,29 @@ import {
   UserPlus,
   Sparkles,
   Globe,
+  User,
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useTranslation } from 'react-i18next';
 
 export function Navbar() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('token'));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
   const supportedLanguages = ['English', 'हिंदी', 'தமிழ்'];
   const navLinks = [
     { label: "findSchemes", to: "/schemes" },
@@ -27,7 +43,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur-md">
       <nav className="container-page flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-sm">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
@@ -38,22 +54,24 @@ export function Navbar() {
           </div>
         </Link>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.label}
               to={link.to}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-navy-600 transition-colors hover:text-primary-700 hover:bg-gray-50"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-navy-600 transition-colors hover:text-primary-700 hover:bg-purple-50/50"
             >
-              {t(`nav.${link.label}`)}
+              {t(`nav.${link.label}`, { defaultValue: link.label })}
             </Link>
           ))}
+
+          {/* Language Dropdown Selector */}
           <div className="relative ml-2">
             <Globe className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <select
               value={i18n.language}
               onChange={(e) => i18n.changeLanguage(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white py-1.5 pl-8 pr-3 text-sm font-medium text-navy-600 focus:border-primary-500"
+              className="rounded-lg border border-gray-200 bg-white py-1.5 pl-8 pr-3 text-sm font-medium text-navy-600 focus:border-primary-500 cursor-pointer"
               aria-label="Select language"
             >
               {supportedLanguages.map((l) => (
@@ -63,12 +81,31 @@ export function Navbar() {
               ))}
             </select>
           </div>
-          <Button to="/login" variant="ghost" size="sm">
-            <LogIn className="h-4 w-4" /> Login
-          </Button>
-          <Button to="/register" variant="primary" size="sm">
-            <UserPlus className="h-4 w-4" /> Sign Up
-          </Button>
+
+          {/* Login / Profile Actions */}
+          {isLoggedIn ? (
+            <div className="flex items-center gap-2 ml-2">
+              <Button to="/dashboard" variant="primary" size="sm" className="gap-1.5">
+                <LayoutDashboard className="h-4 w-4" /> {t('dashboard', { defaultValue: 'Dashboard' })}
+              </Button>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-gray-200 p-2 text-navy-600 hover:bg-gray-50 hover:text-error-600 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 ml-2">
+              <Button to="/login" variant="ghost" size="sm">
+                <LogIn className="h-4 w-4" /> {t('login')}
+              </Button>
+              <Button to="/register" variant="primary" size="sm">
+                <UserPlus className="h-4 w-4" /> {t('signUp')}
+              </Button>
+            </div>
+          )}
         </div>
 
         <button
@@ -81,6 +118,7 @@ export function Navbar() {
         </button>
       </nav>
 
+      {/* Mobile Drawer */}
       {open && (
         <div className="border-t border-gray-100 bg-white md:hidden animate-slide-down">
           <div className="container-page space-y-1 py-3">
@@ -91,7 +129,7 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className="block rounded-lg px-3 py-2.5 text-sm font-medium text-navy-600 hover:bg-primary-50 hover:text-primary-700"
               >
-                {link.label}
+                {t(`nav.${link.label}`, { defaultValue: link.label })}
               </Link>
             ))}
             <div className="flex items-center gap-2 px-3 py-2">
@@ -109,30 +147,32 @@ export function Navbar() {
                 ))}
               </select>
             </div>
-            <div className="flex gap-2 pt-2">
-              <Button
-                to="/login"
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <LogIn className="h-4 w-4" /> {t('login')}
-              </Button>
-              <Button
-                to="/register"
-                variant="primary"
-                size="sm"
-                className="flex-1"
-              >
-                <UserPlus className="h-4 w-4" /> {t('signUp')}
-              </Button>
-            </div>
+
+            {isLoggedIn ? (
+              <div className="flex flex-col gap-2 pt-2">
+                <Button to="/dashboard" variant="primary" size="sm" className="w-full justify-center">
+                  <LayoutDashboard className="h-4 w-4" /> {t('dashboard', { defaultValue: 'Dashboard' })}
+                </Button>
+                <Button onClick={handleLogout} variant="outline" size="sm" className="w-full justify-center text-error-600 border-error-200">
+                  <LogOut className="h-4 w-4" /> {t('logout', { defaultValue: 'Logout' })}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2 pt-2">
+                <Button to="/login" variant="outline" size="sm" className="flex-1">
+                  <LogIn className="h-4 w-4" /> {t('login')}
+                </Button>
+                <Button to="/register" variant="primary" size="sm" className="flex-1">
+                  <UserPlus className="h-4 w-4" /> {t('signUp')}
+                </Button>
+              </div>
+            )}
             <Link
               to="/assistant"
               onClick={() => setOpen(false)}
               className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-navy-50 px-3 py-2.5 text-sm font-semibold text-navy-700"
             >
-              <Sparkles className="h-4 w-4 text-accent-500" /> Ask AI Assistant
+              <Sparkles className="h-4 w-4 text-accent-500" /> {t('askAssistant')}
             </Link>
           </div>
         </div>
