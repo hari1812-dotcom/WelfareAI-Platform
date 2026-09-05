@@ -1,15 +1,15 @@
-import { User, Mail, Phone, MapPin, Calendar, Globe, Edit, Shield } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Globe, Edit, Shield, Users } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { getMe, updateCitizen } from '@/services/api';
+import { getMe } from '@/services/api';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function ProfilePage() {
   const [profile, setProfile] = useState(null);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function loadProfile() {
@@ -23,15 +23,6 @@ export function ProfilePage() {
     loadProfile();
   }, []);
 
-  const changeLanguage = async (e) => {
-    const newLang = e.target.value;
-    i18n.changeLanguage(newLang);
-    if (profile?._id) {
-       setProfile({...profile, language: newLang});
-       try { await updateCitizen(profile._id, { language: newLang }); } catch(err) { console.error('Failed to update language'); }
-    }
-  };
-
   const fallback = {
     name: 'Citizen',
     email: 'No Email',
@@ -40,6 +31,7 @@ export function ProfilePage() {
     age: 0,
     occupation: 'None',
     income: 'None',
+    socialCategory: 'General',
     language: 'English',
   };
 
@@ -51,6 +43,7 @@ export function ProfilePage() {
     age: profile.age || fallback.age,
     occupation: profile.occupation || fallback.occupation,
     income: profile.income || fallback.income,
+    socialCategory: profile.socialCategory || fallback.socialCategory,
     language: profile.language || fallback.language,
   } : fallback;
 
@@ -62,6 +55,7 @@ export function ProfilePage() {
     { label: t('profile.age'), value: current.age, icon: Calendar },
     { label: t('profile.occupation'), value: current.occupation, icon: User },
     { label: t('profile.incomeBracket'), value: current.income, icon: MapPin },
+    { label: t('profile.socialCategory'), value: current.socialCategory, icon: Users },
     { label: t('profile.preferredLanguage'), value: current.language, icon: Globe },
   ];
 
@@ -79,16 +73,7 @@ export function ProfilePage() {
               <Badge variant="success" icon={<Shield className="h-3.5 w-3.5" />}>{t('common.citizenAccount')}</Badge>
             </div>
             
-            <div className="mt-6 text-left">
-              <label htmlFor="lang" className="label-base text-sm font-semibold mb-2 block">{t('common.changeLanguage')}</label>
-              <select id="lang" value={i18n.language} onChange={changeLanguage} className="input-base text-sm">
-                {['English', 'हिंदी', 'தமிழ்'].map((l) => (
-                  <option key={l} value={l}>{l}</option>
-                ))}
-              </select>
-            </div>
-
-            <Button variant="outline" size="sm" className="mt-4 w-full">
+            <Button variant="outline" size="sm" className="mt-6 w-full">
               <Edit className="h-4 w-4" /> {t('profile.editProfile')}
             </Button>
           </Card>

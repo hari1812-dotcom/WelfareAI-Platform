@@ -10,16 +10,17 @@ import {
   Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { languages } from "@/data/mockData";
+import { useTranslation } from 'react-i18next';
 
 export function Navbar() {
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState("English");
+  const supportedLanguages = ['English', 'हिंदी', 'தமிழ்'];
   const navLinks = [
-    { label: "Find Schemes", to: "/schemes" },
-    { label: "Categories", to: "/#categories" },
-    { label: "How It Works", to: "/#how-it-works" },
-    { label: "About", to: "/#trust" },
+    { label: "findSchemes", to: "/schemes" },
+    { label: "categories", to: "/#categories" },
+    { label: "howItWorks", to: "/#how-it-works" },
+    { label: "about", to: "/#trust" },
   ];
 
   return (
@@ -44,18 +45,18 @@ export function Navbar() {
               to={link.to}
               className="rounded-lg px-3 py-2 text-sm font-medium text-navy-600 transition-colors hover:text-primary-700 hover:bg-gray-50"
             >
-              {link.label}
+              {t(`nav.${link.label}`)}
             </Link>
           ))}
           <div className="relative ml-2">
             <Globe className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
+              value={i18n.language}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
               className="rounded-lg border border-gray-200 bg-white py-1.5 pl-8 pr-3 text-sm font-medium text-navy-600 focus:border-primary-500"
               aria-label="Select language"
             >
-              {languages.map((l) => (
+              {supportedLanguages.map((l) => (
                 <option key={l} value={l}>
                   {l}
                 </option>
@@ -96,12 +97,12 @@ export function Navbar() {
             <div className="flex items-center gap-2 px-3 py-2">
               <Globe className="h-4 w-4 text-gray-400" />
               <select
-                value={lang}
-                onChange={(e) => setLang(e.target.value)}
+                value={i18n.language}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm"
                 aria-label="Select language"
               >
-                {languages.map((l) => (
+                {supportedLanguages.map((l) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -115,7 +116,7 @@ export function Navbar() {
                 size="sm"
                 className="flex-1"
               >
-                <LogIn className="h-4 w-4" /> Login
+                <LogIn className="h-4 w-4" /> {t('login')}
               </Button>
               <Button
                 to="/register"
@@ -123,7 +124,7 @@ export function Navbar() {
                 size="sm"
                 className="flex-1"
               >
-                <UserPlus className="h-4 w-4" /> Sign Up
+                <UserPlus className="h-4 w-4" /> {t('signUp')}
               </Button>
             </div>
             <Link

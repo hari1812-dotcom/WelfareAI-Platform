@@ -5,6 +5,7 @@ import { RegisterPage } from '@/pages/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { FindSchemesPage } from '@/pages/FindSchemesPage';
 import { SchemeDetailsPage } from '@/pages/SchemeDetailsPage';
+import { EligibilityPage } from '@/pages/EligibilityPage';
 import { ApplicationsPage } from '@/pages/ApplicationsPage';
 import { BenefitsPage } from '@/pages/BenefitsPage';
 import { DocumentsPage } from '@/pages/DocumentsPage';
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/schemes" element={<FindSchemesPage />} />
         <Route path="/schemes/:id" element={<SchemeDetailsPage />} />
+        <Route path="/schemes/:id/eligibility" element={<EligibilityPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { SchemeCard } from '@/components/shared/SchemeCard';
 import { Button } from '@/components/ui/Button';
-import { categories, schemes, states, occupations, incomeBrackets } from '@/data/mockData';
+import { categories, states, occupations, incomeBrackets } from '@/data/mockData';
 import { useTranslation } from 'react-i18next';
+import { getMe, getRecommendedSchemes } from '@/services/api';
 
 export function FindSchemesPage() {
   const { t } = useTranslation();
@@ -18,7 +19,24 @@ export function FindSchemesPage() {
   const [occupation, setOccupation] = useState('');
   const [income, setIncome] = useState('');
 
-  let filtered = schemes;
+  const [dbSchemes, setDbSchemes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const recommended = await getRecommendedSchemes();
+        setDbSchemes(recommended);
+        setLoading(false);
+      } catch(e) {
+        console.error(e);
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  let filtered = dbSchemes;
   if (selectedCategory) filtered = filtered.filter((s) => s.category === selectedCategory);
   if (search) filtered = filtered.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()) || s.provider.toLowerCase().includes(search.toLowerCase()));
 
@@ -46,23 +64,23 @@ export function FindSchemesPage() {
         <div className="mb-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-card animate-slide-down">
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="label-base">State</label>
+              <label className="label-base">{t('profile.state')}</label>
               <select value={state} onChange={(e) => setState(e.target.value)} className="input-base">
-                <option value="">All states</option>
+                <option value="">{t('allStates')}</option>
                 {states.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="label-base">Occupation</label>
+              <label className="label-base">{t('profile.occupation')}</label>
               <select value={occupation} onChange={(e) => setOccupation(e.target.value)} className="input-base">
-                <option value="">All occupations</option>
+                <option value="">{t('allOccupations')}</option>
                 {occupations.map((o) => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
             <div>
-              <label className="label-base">Income Bracket</label>
+              <label className="label-base">{t('profile.incomeBracket')}</label>
               <select value={income} onChange={(e) => setIncome(e.target.value)} className="input-base">
-                <option value="">All brackets</option>
+                <option value="">{t('allIncomeBrackets')}</option>
                 {incomeBrackets.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
@@ -103,8 +121,12 @@ export function FindSchemesPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((scheme) => (
-          <SchemeCard key={scheme.id} scheme={scheme} />
+        {loading ? (
+          <p className="col-span-3 text-center text-gray-400 py-12">{t('loadingSchemes')}</p>
+        ) : filtered.length === 0 ? (
+          <p className="col-span-3 text-center text-gray-400 py-12">{t('noSchemes')}</p>
+        ) : filtered.map((scheme) => (
+          <SchemeCard key={scheme.schemeId || scheme._id} scheme={scheme} />
         ))}
       </div>
     </DashboardLayout>

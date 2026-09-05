@@ -3,9 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home, Search, FileText, Wallet, FolderOpen, Sparkles,
   GitCompare, SlidersHorizontal, MessageSquare, User, LogOut,
-  ShieldCheck, Menu, X, ChevronLeft,
+  ShieldCheck, Menu, X, ChevronLeft, Globe,
 } from 'lucide-react';
-import { getMe } from '@/services/api';
+import { getMe, updateCitizen } from '@/services/api';
 import { useTranslation } from 'react-i18next';
 
 const navItems = [
@@ -40,6 +40,18 @@ export function DashboardLayout({ children, title, subtitle, backTo }) {
   }, []);
 
   const { t, i18n } = useTranslation();
+  const changeLanguage = async (event) => {
+    const language = event.target.value;
+    i18n.changeLanguage(language);
+    if (user?._id) {
+      try {
+        await updateCitizen(user._id, { language });
+        setUser((currentUser) => ({ ...currentUser, language }));
+      } catch (error) {
+        console.error('Failed to update language', error);
+      }
+    }
+  };
   useEffect(() => {
     if (user?.language) {
       i18n.changeLanguage(user.language);
@@ -77,6 +89,22 @@ export function DashboardLayout({ children, title, subtitle, backTo }) {
 
         <main className="flex-1 min-w-0">
           <div className="container-page py-6 lg:py-8">
+            <div className="mb-5 flex justify-end">
+              <label className="flex items-center gap-2 text-sm font-medium text-navy-600">
+                <Globe className="h-4 w-4 text-primary-600" />
+                <span className="sr-only">{t('common.changeLanguage')}</span>
+                <select
+                  value={i18n.language}
+                  onChange={changeLanguage}
+                  aria-label={t('common.changeLanguage')}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-navy-600 focus:border-primary-500"
+                >
+                  {['English', 'हिंदी', 'தமிழ்'].map((language) => (
+                    <option key={language} value={language}>{language}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
             {backTo && (
               <Link to={backTo} className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-primary-600">
                 <ChevronLeft className="h-4 w-4" /> {t('common.back', { defaultValue: 'Back' })}

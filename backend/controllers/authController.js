@@ -9,7 +9,21 @@ const generateToken = (id) => {
 
 export const register = async (req, res) => {
   try {
-    const { fullName, email, mobile, password, state, age, income, language, aadharNumber, rationCard } = req.body;
+    const {
+      fullName,
+      email,
+      mobile,
+      password,
+      state,
+      age,
+      occupation,
+      income,
+      annualIncomeINR,
+      socialCategory = 'General',
+      language,
+      aadharNumber,
+      rationCard,
+    } = req.body;
     
     const existing = await Citizen.findOne({ email: email?.toLowerCase() });
     if (existing) {
@@ -23,8 +37,11 @@ export const register = async (req, res) => {
       password,
       state,
       language: language || 'English',
-      age: age || 30, // Mock for demo
-      income: income || '250000', // Mock for demo
+      age,
+      occupation,
+      income,
+      annualIncomeINR,
+      socialCategory: socialCategory || 'General',
       aadharNumber,
       rationCard,
     });
@@ -36,6 +53,12 @@ export const register = async (req, res) => {
         fullName: citizen.fullName,
         email: citizen.email,
         mobile: citizen.mobile,
+        state: citizen.state,
+        age: citizen.age,
+        occupation: citizen.occupation,
+        income: citizen.income,
+        annualIncomeINR: citizen.annualIncomeINR,
+        socialCategory: citizen.socialCategory,
       },
     });
   } catch (error) {
@@ -59,6 +82,12 @@ export const login = async (req, res) => {
         fullName: citizen.fullName,
         email: citizen.email,
         mobile: citizen.mobile,
+        state: citizen.state,
+        age: citizen.age,
+        occupation: citizen.occupation,
+        income: citizen.income,
+        annualIncomeINR: citizen.annualIncomeINR,
+        socialCategory: citizen.socialCategory || 'General',
       },
     });
   } catch (error) {

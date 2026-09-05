@@ -14,8 +14,8 @@ import { DashboardCard } from "@/components/shared/DashboardCard";
 import { SchemeCard } from "@/components/shared/SchemeCard";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { schemes, applications, benefits, documents } from "@/data/mockData";
-import { getDashboardData, getMe } from "@/services/api";
+import { applications, benefits, documents } from "@/data/mockData";
+import { getDashboardData, getMe, getRecommendedSchemes } from "@/services/api";
 import { useTranslation } from "react-i18next";
 
 export function DashboardPage() {
@@ -23,16 +23,19 @@ export function DashboardPage() {
   const hour = new Date().getHours();
   const [dashboardData, setDashboardData] = useState(null);
   const [user, setUser] = useState(null);
+  const [schemes, setSchemes] = useState([]);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [dashData, userData] = await Promise.all([
+        const [dashData, userData, recommendedSchemes] = await Promise.all([
           getDashboardData(),
-          getMe()
+          getMe(),
+          getRecommendedSchemes(),
         ]);
         setDashboardData(dashData);
         setUser(userData?.user);
+        setSchemes(recommendedSchemes);
       } catch (err) {
         console.error("Failed to load dashboard data", err);
       }
@@ -60,7 +63,7 @@ export function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           label={t('dashboard.recommendedSchemes')}
-          value={dashboardData?.aiMatchedSchemesCount || schemes.length}
+          value={schemes.length}
           icon={Sparkles}
           color="primary"
           trend="+3 new"

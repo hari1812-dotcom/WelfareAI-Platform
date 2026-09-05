@@ -55,3 +55,10 @@ export function getMe() {
 export function getDashboardData() {
   return request('/dashboard');
 }
+
+export function getRecommendedSchemes() {
+  return request('/schemes/recommend');
+}
+export function getAllSchemes() {
+  return request('/schemes');
+}

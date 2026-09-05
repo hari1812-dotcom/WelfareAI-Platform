@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, User, Mail, Phone, MapPin, ArrowRight, Globe, CreditCard, FileText } from 'lucide-react';
+import { ShieldCheck, User, Mail, Phone, MapPin, ArrowRight, Globe, CreditCard, FileText, Users, IndianRupee, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { states } from '@/data/mockData';
 import { registerCitizen } from '@/services/api';
+import { useTranslation } from 'react-i18next';
 
 export function RegisterPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [language, setLanguage] = useState('English');
   const [error, setError] = useState('');
@@ -26,6 +28,9 @@ export function RegisterPage() {
       language,
       aadharNumber: form.aadharNumber.value.trim(),
       rationCard: form.rationCard.value.trim(),
+      age: form.age.value ? Number(form.age.value) : undefined,
+      socialCategory: form.socialCategory.value,
+      annualIncomeINR: form.annualIncomeINR.value ? Number(form.annualIncomeINR.value) : undefined,
     };
 
     try {
@@ -49,8 +54,8 @@ export function RegisterPage() {
                 <ShieldCheck className="h-6 w-6" />
               </div>
             </Link>
-            <h1 className="mt-4 text-2xl font-bold text-navy-900">Create your account</h1>
-            <p className="mt-1 text-sm text-gray-500">Get started with WelfareAI in minutes</p>
+            <h1 className="mt-4 text-2xl font-bold text-navy-900">{t('createAccount')}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t('registerSub')}</p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card lg:p-8">
@@ -62,15 +67,15 @@ export function RegisterPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="label-base">Full Name</label>
+                <label htmlFor="name" className="label-base">{t('fullName')}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input id="name" name="name" type="text" placeholder="Enter your full name" className="input-base pl-10" required />
+                  <input id="name" name="name" type="text" placeholder={t('fullNamePlaceholder')} className="input-base pl-10" required />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className="label-base">Email Address</label>
+                <label htmlFor="email" className="label-base">{t('emailAddress')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input id="email" name="email" type="email" placeholder="you@example.com" className="input-base pl-10" required />
@@ -78,7 +83,7 @@ export function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="mobile" className="label-base">Mobile Number</label>
+                <label htmlFor="mobile" className="label-base">{t('mobileNumber')}</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input id="mobile" name="mobile" type="tel" placeholder="+91 98765 43210" className="input-base pl-10" required />
@@ -87,10 +92,10 @@ export function RegisterPage() {
 
               <div>
                 <label htmlFor="state" className="label-base">
-                  <MapPin className="mr-1 inline h-4 w-4" /> State
+                  <MapPin className="mr-1 inline h-4 w-4" /> {t('profile.state')}
                 </label>
                 <select id="state" name="state" className="input-base" required>
-                  <option value="">Select your state</option>
+                  <option value="">{t('selectYourState')}</option>
                   {states.map((s) => (
                     <option key={s} value={s}>{s}</option>
                   ))}
@@ -98,33 +103,58 @@ export function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="aadharNumber" className="label-base">Aadhar Card Number</label>
+                <label htmlFor="aadharNumber" className="label-base">{t('aadhar')}</label>
                 <div className="relative">
                   <CreditCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input id="aadharNumber" name="aadharNumber" type="text" placeholder="12-digit Aadhar (Optional)" className="input-base pl-10" />
+                  <input id="aadharNumber" name="aadharNumber" type="text" placeholder={t('aadharPlaceholder')} className="input-base pl-10" />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="rationCard" className="label-base">Ration Card Number</label>
+                <label htmlFor="rationCard" className="label-base">{t('rationCard')}</label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input id="rationCard" name="rationCard" type="text" placeholder="Ration Card Number (Optional)" className="input-base pl-10" />
+                  <input id="rationCard" name="rationCard" type="text" placeholder={t('rationPlaceholder')} className="input-base pl-10" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="age" className="label-base">
+                    <Calendar className="mr-1 inline h-4 w-4" /> {t('age')}
+                  </label>
+                  <input id="age" name="age" type="number" min="1" max="120" placeholder={t('enterAge')} className="input-base" />
+                </div>
+                <div>
+                  <label htmlFor="socialCategory" className="label-base">
+                    <Users className="mr-1 inline h-4 w-4" /> {t('profile.socialCategory')}
+                  </label>
+                  <select id="socialCategory" name="socialCategory" className="input-base">
+                    <option value="">{t('selectCategory')}</option>
+                    {['General', 'OBC', 'SC', 'ST', 'EWS'].map((category) => <option key={category} value={category}>{category}</option>)}
+                  </select>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="label-base">Password</label>
-                <input id="password" name="password" type="password" placeholder="Create a password" className="input-base" minLength={6} required />
+                <label htmlFor="annualIncomeINR" className="label-base">
+                  <IndianRupee className="mr-1 inline h-4 w-4" /> {t('annualIncome')}
+                </label>
+                <input id="annualIncomeINR" name="annualIncomeINR" type="number" min="0" placeholder={t('incomePlaceholder')} className="input-base" />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="label-base">{t('password')}</label>
+                <input id="password" name="password" type="password" placeholder={t('createPassword')} className="input-base" minLength={6} required />
               </div>
 
               <label className="flex items-start gap-2 text-sm text-navy-600">
                 <input type="checkbox" className="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500" required />
-                <span>I agree to the Terms of Service and Privacy Policy</span>
+                <span>{t('terms')}</span>
               </label>
 
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                {loading ? 'Creating Account...' : <>Create Account <ArrowRight className="h-5 w-5" /></>}
+                {loading ? t('creatingAccount') : <>{t('createAccount')} <ArrowRight className="h-5 w-5" /></>}
               </Button>
             </form>
 

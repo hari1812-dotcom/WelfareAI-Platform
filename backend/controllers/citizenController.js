@@ -60,12 +60,24 @@ export async function getCitizenById(req, res) {
 
 export async function updateCitizen(req, res) {
   try {
-    const allowed = ['fullName', 'mobile', 'state', 'language', 'age', 'occupation', 'income'];
+    const allowed = [
+      'fullName',
+      'mobile',
+      'state',
+      'language',
+      'age',
+      'occupation',
+      'income',
+      'annualIncomeINR',
+      'socialCategory',
+    ];
     const updates = {};
 
     for (const field of allowed) {
       if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
+        updates[field] = field === 'socialCategory'
+          ? (req.body[field] || 'General')
+          : req.body[field];
       }
     }
 

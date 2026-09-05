@@ -46,7 +46,7 @@ export function DocumentsPage() {
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-gray-200 bg-white py-16 text-center">
           <FolderOpen className="mx-auto h-12 w-12 text-gray-300" />
-          <p className="mt-3 text-sm text-gray-500">No documents in this category yet.</p>
+          <p className="mt-3 text-sm text-gray-500">{t('noDocuments')}</p>
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
@@ -59,11 +59,11 @@ export function DocumentsPage() {
       <Modal open={showUpload} onClose={() => setShowUpload(false)} title={t('uploadDocument')}>
         <div className="space-y-4">
           <div>
-            <label className="label-base">Document Name</label>
-            <input type="text" placeholder="e.g. Income Certificate" className="input-base" />
+            <label className="label-base">{t('documentName')}</label>
+            <input type="text" placeholder={t('documentPlaceholder')} className="input-base" />
           </div>
           <div>
-            <label className="label-base">Category</label>
+            <label className="label-base">{t('category')}</label>
             <select className="input-base">
               {Object.keys(categoryLabels).map((key) => (
                 <option key={key} value={key}>{t(key)}</option>
@@ -71,18 +71,18 @@ export function DocumentsPage() {
             </select>
           </div>
           <div>
-            <label className="label-base">Document File</label>
+            <label className="label-base">{t('documentFile')}</label>
             <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-8 text-center">
               <FileText className="h-8 w-8 text-gray-300" />
-              <p className="mt-2 text-sm text-gray-500">Drag and drop or click to browse</p>
-              <p className="mt-1 text-xs text-gray-400">PDF, JPG, PNG up to 10MB</p>
+              <p className="mt-2 text-sm text-gray-500">{t('browseFile')}</p>
+              <p className="mt-1 text-xs text-gray-400">{t('fileLimit')}</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={() => setShowUpload(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={() => setShowUpload(false)}>Upload</Button>
+            <Button variant="outline" className="flex-1" onClick={() => setShowUpload(false)}>{t('cancel')}</Button>
+            <Button className="flex-1" onClick={() => setShowUpload(false)}>{t('upload')}</Button>
           </div>
-          <p className="text-center text-xs text-gray-400">OCR and auto-verification will be available in a future update.</p>
+          <p className="text-center text-xs text-gray-400">{t('ocrNote')}</p>
         </div>
       </Modal>
     </DashboardLayout>

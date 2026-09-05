@@ -60,6 +60,16 @@ const citizenSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    socialCategory: {
+      type: String,
+      trim: true,
+      enum: ['General', 'OBC', 'SC', 'ST', 'EWS', ''],
+      default: 'General',
+    },
+    annualIncomeINR: {
+      type: Number,
+      min: 0,
+    },
   },
   {
     timestamps: true,

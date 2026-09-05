@@ -2,20 +2,33 @@ import mongoose from 'mongoose';
 
 const schemeSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    department: { type: String, required: true },
-    type: { type: String, required: true }, // e.g., 'Financial', 'Scholarship'
-    status: { type: String, default: 'Active' },
+    schemeId: { type: String, required: true },
+    name: { type: String, required: true },
+    provider: { type: String, required: true },
+    providerType: { type: String },
+    verification: { type: String },
+    category: { type: String },
+    eligibleCategories: [{ type: String }],
+    matchScore: { type: Number },
+    benefitSummary: { type: String },
+    benefitAmount: { type: String },
+    deadline: { type: String },
+    applicationMethod: { type: String },
+    processingTime: { type: String },
+    shortExplanation: { type: String },
+    overview: { type: String },
+    eligibility: [{ type: String }],
+    benefits: [{ type: String }],
+    documentsRequired: [{ type: String }],
+    applicationProcess: [{ type: String }],
+    // We can embed dataset rules manually or just simple ones
     rules: [
       {
-        field: { type: String, required: true }, // e.g., 'income', 'age'
-        operator: { type: String, required: true }, // e.g., 'LESS_THAN_OR_EQUAL'
-        value: { type: mongoose.Schema.Types.Mixed, required: true },
-      },
-    ],
-    benefitAmount: { type: Number },
-    requiredDocuments: [{ type: String }],
+        field: { type: String },
+        operator: { type: String },
+        value: { type: mongoose.Schema.Types.Mixed },
+      }
+    ]
   },
   { timestamps: true }
 );

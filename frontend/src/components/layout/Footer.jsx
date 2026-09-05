@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="border-t border-gray-200 bg-white">
       <div className="container-page py-12">
@@ -11,25 +13,25 @@ export function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white"><ShieldCheck className="h-5 w-5" /></div>
               <span className="text-lg font-bold text-navy-900">WelfareAI</span>
             </div>
-            <p className="mt-3 max-w-md text-sm text-gray-500 leading-relaxed">Discover government, NGO, and private welfare programs matched to your needs — with simple explanations and personalized guidance.</p>
-            <p className="mt-3 text-xs font-semibold text-primary-600">Discover. Understand. Apply. Track.</p>
+            <p className="mt-3 max-w-md text-sm text-gray-500 leading-relaxed">{t('landingSub')}</p>
+            <p className="mt-3 text-xs font-semibold text-primary-600">{t('simplePersonalized')}</p>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-navy-900">Platform</h4>
+            <h4 className="text-sm font-bold text-navy-900">{t('nav.categories')}</h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/schemes" className="text-gray-500 hover:text-primary-600">Explore Schemes</Link></li>
-              <li><Link to="/login" className="text-gray-500 hover:text-primary-600">Login</Link></li>
-              <li><Link to="/register" className="text-gray-500 hover:text-primary-600">Sign Up</Link></li>
-              <li><Link to="/assistant" className="text-gray-500 hover:text-primary-600">AI Assistant</Link></li>
+              <li><Link to="/schemes" className="text-gray-500 hover:text-primary-600">{t('exploreSchemes')}</Link></li>
+              <li><Link to="/login" className="text-gray-500 hover:text-primary-600">{t('login')}</Link></li>
+              <li><Link to="/register" className="text-gray-500 hover:text-primary-600">{t('signUp')}</Link></li>
+              <li><Link to="/assistant" className="text-gray-500 hover:text-primary-600">{t('aiAssistTitle')}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-navy-900">Categories</h4>
+            <h4 className="text-sm font-bold text-navy-900">{t('nav.categories')}</h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/schemes?category=education" className="text-gray-500 hover:text-primary-600">Education</Link></li>
-              <li><Link to="/schemes?category=healthcare" className="text-gray-500 hover:text-primary-600">Healthcare</Link></li>
-              <li><Link to="/schemes?category=employment" className="text-gray-500 hover:text-primary-600">Employment</Link></li>
-              <li><Link to="/schemes?category=housing" className="text-gray-500 hover:text-primary-600">Housing</Link></li>
+              <li><Link to="/schemes?category=education" className="text-gray-500 hover:text-primary-600">{t('education')}</Link></li>
+              <li><Link to="/schemes?category=healthcare" className="text-gray-500 hover:text-primary-600">{t('healthcare')}</Link></li>
+              <li><Link to="/schemes?category=employment" className="text-gray-500 hover:text-primary-600">{t('employment')}</Link></li>
+              <li><Link to="/schemes?category=housing" className="text-gray-500 hover:text-primary-600">{t('housing')}</Link></li>
             </ul>
           </div>
         </div>

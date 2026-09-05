@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Mail, Phone, Lock, Eye, EyeOff, Globe, ArrowRight, User } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { login } from '@/services/api';
+import { useTranslation } from 'react-i18next';
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [mode, setMode] = useState('email');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,8 +43,8 @@ export function LoginPage() {
                 <ShieldCheck className="h-6 w-6" />
               </div>
             </Link>
-            <h1 className="mt-4 text-2xl font-bold text-navy-900">Welcome back</h1>
-            <p className="mt-1 text-sm text-gray-500">Login to your WelfareAI account</p>
+            <h1 className="mt-4 text-2xl font-bold text-navy-900">{t('authWelcome')}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t('authLoginSub')}</p>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card lg:p-8">
@@ -52,20 +54,20 @@ export function LoginPage() {
                 onClick={() => setMode('email')}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${mode === 'email' ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500'}`}
               >
-                <Mail className="mr-1.5 inline h-4 w-4" /> Email
+                <Mail className="mr-1.5 inline h-4 w-4" /> {t('emailAddress')}
               </button>
               <button
                 onClick={() => setMode('mobile')}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${mode === 'mobile' ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500'}`}
               >
-                <Phone className="mr-1.5 inline h-4 w-4" /> Mobile
+                <Phone className="mr-1.5 inline h-4 w-4" /> {t('mobileNumber')}
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'email' ? (
                 <div>
-                  <label htmlFor="email" className="label-base">Email Address</label>
+                  <label htmlFor="email" className="label-base">{t('emailAddress')}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="input-base pl-10" required />
@@ -73,7 +75,7 @@ export function LoginPage() {
                 </div>
               ) : (
                 <div>
-                  <label htmlFor="mobile" className="label-base">Mobile Number</label>
+                  <label htmlFor="mobile" className="label-base">{t('mobileNumber')}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input id="mobile" type="tel" placeholder="+91 98765 43210" className="input-base pl-10" required />
@@ -82,13 +84,13 @@ export function LoginPage() {
               )}
 
               <div>
-                <label htmlFor="password" className="label-base">Password</label>
+                <label htmlFor="password" className="label-base">{t('password')}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter password"
+                    placeholder={t('enterPassword')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="input-base pl-10 pr-10"
@@ -107,27 +109,27 @@ export function LoginPage() {
 
               {showOtp && (
                 <div className="animate-slide-down">
-                  <label htmlFor="otp" className="label-base">Enter OTP</label>
-                  <input id="otp" type="text" maxLength={6} placeholder="6-digit OTP" className="input-base tracking-widest" />
-                  <p className="mt-1 text-xs text-gray-400">Demo OTP: 123456</p>
+                  <label htmlFor="otp" className="label-base">{t('enterOtp')}</label>
+                  <input id="otp" type="text" maxLength={6} placeholder={t('otpPlaceholder')} className="input-base tracking-widest" />
+                  <p className="mt-1 text-xs text-gray-400">{t('demoOtp')}</p>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm text-navy-600">
                   <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
-                  Remember me
+                  {t('rememberMe')}
                 </label>
               </div>
 
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
-              <Button type="submit" size="lg" className="w-full">Login</Button>
+              <Button type="submit" size="lg" className="w-full">{t('login')}</Button>
             </form>
 
             <div className="mt-5 border-t border-gray-100 pt-4">
               <p className="text-center text-sm text-navy-600">
-                Don't have an account? <Link to="/register" className="font-semibold text-primary-600 hover:text-primary-700">Sign up</Link>
+                {t('noAccount')} <Link to="/register" className="font-semibold text-primary-600 hover:text-primary-700">{t('signUp')}</Link>
               </p>
             </div>
           </div>
