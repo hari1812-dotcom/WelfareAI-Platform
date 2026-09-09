@@ -8,6 +8,7 @@ const resources = {
     translation: {
       menu: {
         home: "Home",
+        mySchemes: "My Schemes",
         findSchemes: "Find Schemes",
         myApplications: "My Applications",
         myBenefits: "My Benefits",
@@ -130,6 +131,7 @@ const resources = {
     translation: {
       menu: {
         home: "होम",
+        mySchemes: "मेरी योजनाएं",
         findSchemes: "योजनाएं खोजें",
         myApplications: "मेरे आवेदन",
         myBenefits: "मेरे लाभ",
@@ -252,6 +254,7 @@ const resources = {
     translation: {
       menu: {
         home: "முகப்பு",
+        mySchemes: "என் திட்டங்கள்",
         findSchemes: "திட்டங்களை தேடுங்கள்",
         myApplications: "என் விண்ணப்பங்கள்",
         myBenefits: "என் பயன்கள்",

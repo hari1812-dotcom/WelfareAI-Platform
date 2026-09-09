@@ -102,7 +102,7 @@ export function DashboardPage() {
             </p>
           </div>
           <Link
-            to="/schemes"
+            to="/my-schemes  "
             className="hidden text-sm font-semibold text-primary-600 hover:text-primary-700 sm:flex items-center gap-1"
           >
             {t('dashboard.viewAll')} <ArrowRight className="h-4 w-4" />

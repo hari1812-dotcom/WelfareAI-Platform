@@ -10,7 +10,7 @@ import { SchemeCard } from '@/components/shared/SchemeCard';
 import { Button } from '@/components/ui/Button';
 import { categories as mockCategories, states, occupations, incomeBrackets, schemes as mockSchemes } from '@/data/mockData';
 import { useTranslation } from 'react-i18next';
-import { getRecommendedSchemes } from '@/services/api';
+import { getRecommendedSchemes, getMe } from '@/services/api';
 import { getSchemeTranslation } from '@/data/schemeTranslations';
 import datasetData from '@/data/dataset.json';
 
@@ -107,20 +107,39 @@ export function FindSchemesPage() {
     income: locationState?.situation?.income || '₹2.5-5 lakh',
   });
 
+  const [userProfile, setUserProfile] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(true);
   const [formError, setFormError] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const [recommendedSchemes, setRecommendedSchemes] = useState([]);
   const [dbSchemes, setDbSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch schemes from backend or fallback to mock dataset
+  // Fetch logged in profile & schemes
   useEffect(() => {
-    async function loadSchemes() {
+    async function loadData() {
       setLoading(true);
       try {
-        const res = await getRecommendedSchemes();
-        if (res && res.length > 0) {
-          setDbSchemes(res);
+        const [res, profileRes] = await Promise.allSettled([
+          getRecommendedSchemes(),
+          getMe()
+        ]);
+
+        if (profileRes.status === 'fulfilled' && profileRes.value?.user) {
+          const u = profileRes.value.user;
+          setUserProfile(u);
+          if (!locationState?.situation) {
+            setSituationForm({
+              state: u.state || 'Tamil Nadu',
+              age: u.age ? String(u.age) : '30',
+              occupation: u.occupation || 'Salaried Employee',
+              income: u.income || '₹2.5-5 lakh',
+            });
+          }
+        }
+
+        if (res.status === 'fulfilled' && res.value && res.value.length > 0) {
+          setDbSchemes(res.value);
         } else {
           setDbSchemes(mockSchemes);
         }
@@ -130,7 +149,7 @@ export function FindSchemesPage() {
         setLoading(false);
       }
     }
-    loadSchemes();
+    loadData();
   }, []);
 
   // Compute dataset-backed recommendations when situation form is submitted or filters change
@@ -251,12 +270,26 @@ export function FindSchemesPage() {
   const handleSituationSubmit = (e) => {
     e.preventDefault();
     setFormError('');
+
+    if (situationForm.age) {
+      const ageNum = parseInt(situationForm.age, 10);
+      if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+        setFormError('Please enter a valid age between 1 and 120.');
+        return;
+      }
+    }
+
     if (!situationForm.state && !situationForm.age && !situationForm.occupation && !situationForm.income) {
-      setFormError('Please select at least one field to find personalized recommendations.');
+      setFormError('Please select at least one demographic field to find matching schemes.');
       return;
     }
-    setFormSubmitted(true);
-    evaluateDatasetRecommendations();
+
+    setIsProcessing(true);
+    setTimeout(() => {
+      setFormSubmitted(true);
+      evaluateDatasetRecommendations();
+      setIsProcessing(false);
+    }, 300);
   };
 
   // Filter logic for main scheme gallery
@@ -385,12 +418,22 @@ export function FindSchemesPage() {
                   onClick={() => {
                     setSituationForm({ state: '', age: '', occupation: '', income: '' });
                     setRecommendedSchemes([]);
+                    setFormError('');
                   }}
                 >
                   <X className="h-4 w-4" /> Reset Form
                 </Button>
-                <Button type="submit" size="md" className="gap-2 shadow-sm">
-                  <Search className="h-4 w-4" /> Find Matching Schemes
+                <Button type="submit" size="md" disabled={isProcessing} className="gap-2 shadow-sm">
+                  {isProcessing ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Finding schemes...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4" /> Find Matching Schemes
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

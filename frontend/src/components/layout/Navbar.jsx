@@ -33,6 +33,7 @@ export function Navbar() {
 
   const supportedLanguages = ['English', 'हिंदी', 'தமிழ்'];
   const navLinks = [
+    { label: "mySchemes", to: "/my-schemes" },
     { label: "findSchemes", to: "/schemes" },
     { label: "categories", to: "/#categories" },
     { label: "howItWorks", to: "/#how-it-works" },

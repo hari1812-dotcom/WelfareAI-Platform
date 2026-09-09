@@ -4,6 +4,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { FindSchemesPage } from '@/pages/FindSchemesPage';
+import { MySchemesPage } from '@/pages/MySchemesPage';
 import { SchemeDetailsPage } from '@/pages/SchemeDetailsPage';
 import { EligibilityPage } from '@/pages/EligibilityPage';
 import { ApplicationsPage } from '@/pages/ApplicationsPage';
@@ -21,6 +22,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/my-schemes" element={<MySchemesPage />} />
         <Route path="/schemes" element={<FindSchemesPage />} />
         <Route path="/schemes/:id" element={<SchemeDetailsPage />} />
         <Route path="/schemes/:id/eligibility" element={<EligibilityPage />} />
