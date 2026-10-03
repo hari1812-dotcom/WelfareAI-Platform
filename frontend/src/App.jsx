@@ -16,6 +16,7 @@ import { ComparePage } from '@/pages/ComparePage';
 import { AdminPage } from '@/pages/AdminPage';
 import { FeedbackPage } from '@/pages/FeedbackPage';
 import { ProfilePage } from '@/pages/ProfilePage';
+import { CategoryPage } from '@/pages/CategoryPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/my-schemes" element={<MySchemesPage />} />
         <Route path="/schemes" element={<FindSchemesPage />} />
+        <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/schemes/:id" element={<SchemeDetailsPage />} />
         <Route path="/schemes/:id/eligibility" element={<EligibilityPage />} />
         <Route path="/login" element={<LoginPage />} />

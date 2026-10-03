@@ -87,7 +87,7 @@ export function Navbar() {
           {isLoggedIn ? (
             <div className="flex items-center gap-2 ml-2">
               <Button to="/dashboard" variant="primary" size="sm" className="gap-1.5">
-                <LayoutDashboard className="h-4 w-4" /> {t('dashboard', { defaultValue: 'Dashboard' })}
+                <LayoutDashboard className="h-4 w-4" /> {t('nav.dashboard', { defaultValue: 'Dashboard' })}
               </Button>
               <button
                 onClick={handleLogout}
@@ -152,7 +152,7 @@ export function Navbar() {
             {isLoggedIn ? (
               <div className="flex flex-col gap-2 pt-2">
                 <Button to="/dashboard" variant="primary" size="sm" className="w-full justify-center">
-                  <LayoutDashboard className="h-4 w-4" /> {t('dashboard', { defaultValue: 'Dashboard' })}
+                  <LayoutDashboard className="h-4 w-4" /> {t('nav.dashboard', { defaultValue: 'Dashboard' })}
                 </Button>
                 <Button onClick={handleLogout} variant="outline" size="sm" className="w-full justify-center text-error-600 border-error-200">
                   <LogOut className="h-4 w-4" /> {t('logout', { defaultValue: 'Logout' })}

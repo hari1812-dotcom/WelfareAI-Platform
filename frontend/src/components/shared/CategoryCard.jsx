@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, GraduationCap, Heart, Baby, Users, Stethoscope, Accessibility, Wheat, Briefcase, Home, Wallet, Rocket, Award } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 
+import { schemes } from '@/data/mockData';
+
 const iconMap = {
   education: GraduationCap, women: Heart, children: Baby, 'senior-citizens': Users,
   healthcare: Stethoscope, 'disability-support': Accessibility, agriculture: Wheat,
@@ -9,23 +11,52 @@ const iconMap = {
   entrepreneurship: Rocket, scholarships: Award,
 };
 
-export function CategoryCard({ category }) {
-  const Icon = iconMap[category.id];
+function getExpandedSchemesCount(categoryId) {
+  const categoryMatchMap = {
+    'education': ['education', 'scholarships'],
+    'scholarships': ['scholarships', 'education'],
+    'women': ['women', 'children', 'entrepreneurship'],
+    'children': ['children', 'education', 'healthcare', 'women'],
+    'senior-citizens': ['senior-citizens', 'financial-assistance', 'healthcare'],
+    'healthcare': ['healthcare', 'children', 'senior-citizens', 'disability-support'],
+    'disability-support': ['disability-support', 'financial-assistance', 'healthcare'],
+    'agriculture': ['agriculture', 'financial-assistance'],
+    'employment': ['employment', 'scholarships', 'entrepreneurship'],
+    'housing': ['housing'],
+    'financial-assistance': ['financial-assistance', 'senior-citizens', 'agriculture', 'women', 'disability-support'],
+    'entrepreneurship': ['entrepreneurship', 'employment', 'financial-assistance']
+  };
+
+  const selLower = (categoryId || '').toLowerCase();
+  const matchedCategories = categoryMatchMap[selLower] || [selLower];
+
+  return schemes.filter((s) => {
+    const cat = (s.category || '').toLowerCase();
+    const tags = (s.tags || []).map((t) => t.toLowerCase());
+    return cat === selLower || matchedCategories.includes(cat) || tags.some((t) => matchedCategories.includes(t));
+  }).length;
+}
+
+export function CategoryCard({ category, onClick }) {
+  const Icon = iconMap[category.id] || Award;
+  const dynamicCount = getExpandedSchemesCount(category.id);
   return (
-    <Card className="group p-5" hover>
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
-          <Icon className="h-6 w-6" />
+    <Link to={`/category/${category.id}`} className="block group text-left h-full" onClick={onClick}>
+      <Card className="p-5 h-full transition-all duration-200 group-hover:border-primary-400 group-hover:shadow-md cursor-pointer flex flex-col justify-between" hover>
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-600 group-hover:text-white">
+            <Icon className="h-6 w-6" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-navy-900 group-hover:text-primary-700 transition-colors">{category.name}</h3>
+            <p className="mt-1 text-xs text-gray-500 leading-relaxed">{category.description}</p>
+            <p className="mt-2 text-xs font-semibold text-primary-600">{dynamicCount} schemes</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h3 className="text-sm font-bold text-navy-900 group-hover:text-primary-700 transition-colors">{category.name}</h3>
-          <p className="mt-1 text-xs text-gray-500 leading-relaxed">{category.description}</p>
-          <p className="mt-2 text-xs font-semibold text-primary-600">{category.schemeCount} schemes</p>
+        <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-primary-600 group-hover:text-primary-700 transition-colors pt-2 border-t border-gray-100">
+          Explore Schemes <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
         </div>
-      </div>
-      <Link to={`/schemes?category=${category.id}`} className="mt-4 flex items-center gap-1 text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors">
-        Explore <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
-    </Card>
+      </Card>
+    </Link>
   );
 }

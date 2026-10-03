@@ -1,3 +1,5 @@
+import { extraSchemes } from './extraSchemes';
+
 export const categories = [
   { id: 'education', name: 'Education', description: 'Scholarships, fee waivers, and education support', icon: 'GraduationCap', schemeCount: 142 },
   { id: 'women', name: 'Women', description: 'Welfare and empowerment programs for women', icon: 'Heart', schemeCount: 87 },
@@ -370,6 +372,162 @@ export const schemes = [
       { label: 'Occupation matches (Daily wage)', status: 'match' },
     ],
   },
+  {
+    id: 'sukanya-samriddhi',
+    schemeId: 'sukanya-samriddhi',
+    name: 'Sukanya Samriddhi Yojana (SSY)',
+    provider: 'Ministry of Women & Child Development / India Post',
+    providerType: 'government',
+    verification: 'government_verified',
+    category: 'women',
+    tags: ['women', 'children', 'financial-assistance'],
+    matchScore: 94,
+    benefitSummary: 'High-interest tax-free savings scheme for girl child education & welfare (8.2% p.a.)',
+    benefitAmount: 'Up to ₹1.5L/yr tax exemption + 8.2% Interest',
+    deadline: 'Rolling enrollment',
+    applicationMethod: 'Post Office / Bank Branches',
+    processingTime: '1-3 days',
+    shortExplanation: 'Small deposit scheme backed by Govt of India dedicated to securing the financial future and education of girl children.',
+    overview: 'Sukanya Samriddhi Yojana is a small savings scheme launched under Beti Bachao Beti Padhao campaign. It offers high tax-free interest rates and long-term financial security for girls up to 10 years of age.',
+    eligibility: [
+      'Girl child resident of India aged below 10 years',
+      'Maximum 2 girl child accounts per family',
+      'Parent or legal guardian can open account',
+    ],
+    benefits: [
+      '8.2% per annum compound interest rate (quarterly revised)',
+      'Section 80C tax deduction benefits up to ₹1.5 Lakh per year',
+      'Partial withdrawal up to 50% for higher education after age 18',
+    ],
+    documentsRequired: [
+      'Birth certificate of Girl Child', 'Identity & Address proof of Parent/Guardian', 'Aadhaar Card',
+    ],
+    applicationProcess: [
+      'Visit nearest Post Office or authorized Commercial Bank branch',
+      'Fill SSY Account Opening Form',
+      'Submit birth certificate and guardian KYC documents',
+      'Deposit initial opening amount (min ₹250)',
+    ],
+    matchReasons: [
+      { label: 'Targeted for Women & Girl Child Empowerment', status: 'match' },
+      { label: 'Government Tax-Exempt Backed', status: 'match' },
+    ],
+  },
+  {
+    id: 'poshan-abhiyaan',
+    schemeId: 'poshan-abhiyaan',
+    name: 'PM POSHAN Abhiyaan (National Nutrition Mission)',
+    provider: 'Ministry of Education & MWCD',
+    providerType: 'government',
+    verification: 'government_verified',
+    category: 'children',
+    tags: ['children', 'healthcare', 'education'],
+    matchScore: 90,
+    benefitSummary: 'Free hot nutritious meals & health monitoring for school students & infants',
+    benefitAmount: '100% Free Daily Meals & Supplements',
+    deadline: 'Ongoing Scheme',
+    applicationMethod: 'Government Schools / Anganwadi Centers',
+    processingTime: 'Immediate',
+    shortExplanation: 'Flagship national program ensuring child nutrition, growth tracking, and healthy development in schools and Anganwadis.',
+    overview: 'PM POSHAN provides nutritious cooked meals to over 12 crore children studying in Classes I to VIII in government and government-aided schools across India.',
+    eligibility: [
+      'Children enrolled in government/government-aided schools',
+      'Infants and pregnant/lactating mothers registered at Anganwadis',
+    ],
+    benefits: [
+      'Nutritious daily meals meeting mandated calorie & protein standards',
+      'Free micronutrient supplementation & health check-ups',
+      'Reduces malnutrition and boosts school attendance',
+    ],
+    documentsRequired: [
+      'School Admission Record or Anganwadi Registration', 'Aadhaar Card',
+    ],
+    applicationProcess: [
+      'Automatic enrollment upon admission to government/aided school or Anganwadi',
+    ],
+    matchReasons: [
+      { label: 'Child Growth & Health Priority', status: 'match' },
+      { label: 'Universal School Nutrition Coverage', status: 'match' },
+    ],
+  },
+  {
+    id: 'pmvvya',
+    schemeId: 'pmvvya',
+    name: 'Pradhan Mantri Vaya Vandana Yojana (PMVVYA)',
+    provider: 'LIC of India / Ministry of Finance',
+    providerType: 'government',
+    verification: 'government_verified',
+    category: 'senior-citizens',
+    tags: ['senior-citizens', 'financial-assistance', 'healthcare'],
+    matchScore: 93,
+    benefitSummary: 'Guaranteed pension scheme for senior citizens aged 60+ with fixed 7.4% returns',
+    benefitAmount: '₹1,000 to ₹9,250/month pension',
+    deadline: 'Rolling',
+    applicationMethod: 'LIC Branch / Online',
+    processingTime: '7 days',
+    shortExplanation: 'Pension scheme exclusively for senior citizens offering guaranteed payout for 10 years.',
+    overview: 'Pradhan Mantri Vaya Vandana Yojana provides social security and monthly income to senior citizens against market volatility through guaranteed annual returns.',
+    eligibility: [
+      'Must be a senior citizen of India aged 60 years or above',
+      'No upper age limit for entry',
+    ],
+    benefits: [
+      'Assured return of 7.4% per annum payable monthly',
+      '10-year policy term with pension payout choice (Monthly/Quarterly/Annual)',
+      'Loan facility up to 75% of purchase price after 3 policy years',
+    ],
+    documentsRequired: [
+      'Aadhaar Card', 'PAN Card', 'Proof of Age', 'Bank Account details',
+    ],
+    applicationProcess: [
+      'Visit LIC office or apply via LIC India online portal',
+      'Select lump-sum investment purchase price',
+      'Receive regular automated pension directly in bank account',
+    ],
+    matchReasons: [
+      { label: 'Senior Citizen Age Eligibility Met', status: 'match' },
+      { label: 'Guaranteed Govt Security', status: 'match' },
+    ],
+  },
+  {
+    id: 'adip-disability',
+    schemeId: 'adip-disability',
+    name: 'ADIP Scheme (Assistance to Disabled Persons)',
+    provider: 'Department of Empowerment of Persons with Disabilities',
+    providerType: 'government',
+    verification: 'government_verified',
+    category: 'disability-support',
+    tags: ['disability-support', 'healthcare', 'financial-assistance'],
+    matchScore: 92,
+    benefitSummary: 'Free distribution of modern aids, motorized tricycles & hearing aids for Divyangjan',
+    benefitAmount: '100% Subsidized Assistive Equipment',
+    deadline: 'Rolling Camps & Online',
+    applicationMethod: 'ALIMCO Camps / Online Portal',
+    processingTime: '15-30 days',
+    shortExplanation: 'Assistance scheme for persons with disabilities to obtain modern durable aids and appliances.',
+    overview: 'ADIP scheme assists needy persons with disabilities in procuring durable, sophisticated, and scientifically manufactured aids and appliances to promote physical, social, and psychological rehabilitation.',
+    eligibility: [
+      'Indian citizen with 40% or more certified disability',
+      'Monthly income from all sources not exceeding ₹30,000',
+    ],
+    benefits: [
+      'Free motorized tricycles, wheelchairs, hearing aids & prosthetics',
+      'Coverage of fitting expenses and travel costs to assessment camps',
+    ],
+    documentsRequired: [
+      'Disability Certificate (UDID)', 'Income Certificate', 'Aadhaar Card', 'Passport Photograph',
+    ],
+    applicationProcess: [
+      'Register at ALIMCO distribution camp or state disability welfare office',
+      'Submit UDID card and income proof for assessment',
+      'Receive custom-fitted assistive aid free of charge',
+    ],
+    matchReasons: [
+      { label: '100% Disability Support Priority', status: 'match' },
+      { label: 'UDID Verified Assistance', status: 'match' },
+    ],
+  },
+  ...extraSchemes
 ];
 
 export const applications = [

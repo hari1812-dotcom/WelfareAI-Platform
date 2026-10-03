@@ -90,7 +90,7 @@ function parseIncomeBounds(incomeStr) {
 
 export function FindSchemesPage() {
   const { t, i18n } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const locationState = useLocation().state;
   const navigate = useNavigate();
 
@@ -98,6 +98,20 @@ export function FindSchemesPage() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || null);
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const catFromUrl = searchParams.get('category');
+    setSelectedCategory(catFromUrl || null);
+  }, [searchParams]);
+
+  const handleCategoryChange = (catId) => {
+    setSelectedCategory(catId);
+    if (catId) {
+      setSearchParams({ category: catId });
+    } else {
+      setSearchParams({});
+    }
+  };
 
   // Situation Form State
   const [situationForm, setSituationForm] = useState({
@@ -292,15 +306,33 @@ export function FindSchemesPage() {
     }, 300);
   };
 
-  // Filter logic for main scheme gallery
+  // Comprehensive Category Filter logic for main scheme gallery
   let gallerySchemes = dbSchemes.length > 0 ? dbSchemes : mockSchemes;
 
   if (selectedCategory) {
-    gallerySchemes = gallerySchemes.filter(
-      (s) => s.category?.toLowerCase() === selectedCategory.toLowerCase() ||
-             (selectedCategory === 'education' && s.category === 'scholarships') ||
-             (selectedCategory === 'women' && s.category === 'children')
-    );
+    const categoryMatchMap = {
+      'education': ['education', 'scholarships'],
+      'scholarships': ['scholarships', 'education'],
+      'women': ['women', 'children', 'entrepreneurship'],
+      'children': ['children', 'education', 'healthcare', 'women'],
+      'senior-citizens': ['senior-citizens', 'financial-assistance', 'healthcare'],
+      'healthcare': ['healthcare', 'children', 'senior-citizens', 'disability-support'],
+      'disability-support': ['disability-support', 'financial-assistance', 'healthcare'],
+      'agriculture': ['agriculture', 'financial-assistance'],
+      'employment': ['employment', 'scholarships', 'entrepreneurship'],
+      'housing': ['housing'],
+      'financial-assistance': ['financial-assistance', 'senior-citizens', 'agriculture', 'women', 'disability-support'],
+      'entrepreneurship': ['entrepreneurship', 'employment', 'financial-assistance']
+    };
+
+    const selLower = selectedCategory.toLowerCase();
+    const matchedCategories = categoryMatchMap[selLower] || [selLower];
+
+    gallerySchemes = gallerySchemes.filter((s) => {
+      const cat = (s.category || '').toLowerCase();
+      const tags = (s.tags || []).map(t => t.toLowerCase());
+      return cat === selLower || matchedCategories.includes(cat) || tags.some(t => matchedCategories.includes(t));
+    });
   }
 
   if (situationForm.state && showFilters) {
@@ -583,10 +615,35 @@ export function FindSchemesPage() {
             </Button>
           </div>
 
+          {/* Category Banner if Category is selected */}
+          {selectedCategory && (
+            <div className="mb-6 rounded-2xl border border-primary-200 bg-gradient-to-r from-primary-900 via-navy-900 to-purple-950 p-6 text-white shadow-md flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="rounded-full bg-white/20 px-3 py-1 text-2xs font-extrabold uppercase tracking-wider text-white">
+                    Category Filter Active
+                  </span>
+                </div>
+                <h3 className="text-xl font-extrabold text-white capitalize">
+                  {allCategoriesList.find(c => c.id.toLowerCase() === selectedCategory.toLowerCase())?.name || selectedCategory.replace('-', ' ')} Schemes
+                </h3>
+                <p className="mt-1 text-xs text-purple-200">
+                  Showing {gallerySchemes.length} official welfare scheme{gallerySchemes.length !== 1 ? 's' : ''} available under this category.
+                </p>
+              </div>
+              <button
+                onClick={() => handleCategoryChange(null)}
+                className="rounded-xl bg-white/10 hover:bg-white/20 border border-white/30 px-3.5 py-2 text-xs font-bold text-white transition-colors flex items-center gap-1.5 shrink-0"
+              >
+                <X className="h-4 w-4" /> Clear Category
+              </button>
+            </div>
+          )}
+
           {/* Category Chips */}
           <div className="mb-6 flex flex-wrap gap-2">
             <button
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => handleCategoryChange(null)}
               className={`rounded-full border px-4 py-2 text-xs font-bold transition-all ${
                 !selectedCategory
                   ? 'border-primary-600 bg-primary-600 text-white shadow-sm'
@@ -598,7 +655,7 @@ export function FindSchemesPage() {
             {allCategoriesList.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => handleCategoryChange(cat.id)}
                 className={`rounded-full border px-4 py-2 text-xs font-bold transition-all ${
                   selectedCategory === cat.id
                     ? 'border-primary-600 bg-primary-600 text-white shadow-sm'
