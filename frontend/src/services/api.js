@@ -99,3 +99,9 @@ export function getDocumentFileUrl(id, download = false) {
   return `${API_BASE}/documents/${id}/file?download=${download}${token ? `&token=${token}` : ''}`;
 }
 
+export function simulateEligibilityApi(payload) {
+  return request('/schemes/simulate', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}

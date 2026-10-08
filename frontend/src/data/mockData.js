@@ -1,29 +1,26 @@
-import { extraSchemes } from './extraSchemes';
+import dataset from './dataset_with_all_categories.json';
 
-export const categories = [
-  { id: 'education', name: 'Education', description: 'Scholarships, fee waivers, and education support', icon: 'GraduationCap', schemeCount: 142 },
-  { id: 'women', name: 'Women', description: 'Welfare and empowerment programs for women', icon: 'Heart', schemeCount: 87 },
-  { id: 'children', name: 'Children', description: 'Child nutrition, protection, and development', icon: 'Baby', schemeCount: 64 },
-  { id: 'senior-citizens', name: 'Senior Citizens', description: 'Pension and healthcare for elderly citizens', icon: 'Users', schemeCount: 53 },
-  { id: 'healthcare', name: 'Healthcare', description: 'Health insurance and medical assistance', icon: 'Stethoscope', schemeCount: 98 },
-  { id: 'disability-support', name: 'Disability Support', description: 'Disability pensions and accessibility programs', icon: 'Accessibility', schemeCount: 41 },
-  { id: 'agriculture', name: 'Agriculture', description: 'Farmer support, crop insurance, and subsidies', icon: 'Wheat', schemeCount: 76 },
-  { id: 'employment', name: 'Employment', description: 'Job training and employment guarantee schemes', icon: 'Briefcase', schemeCount: 59 },
-  { id: 'housing', name: 'Housing', description: 'Affordable housing and shelter programs', icon: 'Home', schemeCount: 44 },
-  { id: 'financial-assistance', name: 'Financial Assistance', description: 'Direct benefit transfers and financial aid', icon: 'Wallet', schemeCount: 112 },
-  { id: 'entrepreneurship', name: 'Entrepreneurship', description: 'Startup loans and business development support', icon: 'Rocket', schemeCount: 38 },
-  { id: 'scholarships', name: 'Scholarships', description: 'Merit and need-based scholarship programs', icon: 'Award', schemeCount: 95 },
-];
+const schemeCategoryMap = {};
+const schemeTagsMap = {};
+dataset.forEach(item => {
+  if (item.Eligible_Scheme && item.Scheme_Category) {
+    const categories = Array.isArray(item.Scheme_Category) ? item.Scheme_Category : [item.Scheme_Category];
+    const normalizedCats = categories.map(c => c.toLowerCase().replace(/\s+/g, '-'));
+    schemeCategoryMap[item.Eligible_Scheme.toLowerCase()] = normalizedCats[0];
+    schemeTagsMap[item.Eligible_Scheme.toLowerCase()] = normalizedCats;
+  }
+});
 
-export const schemes = [
+const baseSchemes = [
   {
     id: 'atal-pension-yojana',
     schemeId: 'atal-pension-yojana',
-    name: 'Atal Pension Yojana (APY)',
+    name: 'Atal Pension Yojana',
     provider: 'PFRDA / Ministry of Finance',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'financial-assistance',
+    category: schemeCategoryMap['atal pension yojana'] || 'financial-assistance',
+    tags: schemeTagsMap['atal pension yojana'] || [],
     matchScore: 95,
     benefitSummary: 'Guaranteed pension of ₹1,000 to ₹5,000/month after age 60',
     benefitAmount: '₹1,000 - ₹5,000/month',
@@ -61,11 +58,12 @@ export const schemes = [
   {
     id: 'ayushman-bharat',
     schemeId: 'ayushman-bharat',
-    name: 'Ayushman Bharat PM-JAY',
+    name: 'Ayushman Bharat',
     provider: 'National Health Authority',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'healthcare',
+    category: schemeCategoryMap['ayushman bharat'] || 'healthcare',
+    tags: schemeTagsMap['ayushman bharat'] || [],
     matchScore: 91,
     benefitSummary: 'Health coverage up to ₹5 lakh per family per year',
     benefitAmount: '₹5 lakh/year',
@@ -105,11 +103,12 @@ export const schemes = [
   {
     id: 'pmay-housing',
     schemeId: 'pmay-housing',
-    name: 'Pradhan Mantri Awas Yojana (Urban)',
+    name: 'PM Awas Yojana',
     provider: 'Ministry of Housing and Urban Affairs',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'housing',
+    category: schemeCategoryMap['pm awas yojana'] || 'housing',
+    tags: schemeTagsMap['pm awas yojana'] || [],
     matchScore: 86,
     benefitSummary: 'Subsidized home loan up to ₹2.67 lakh interest subsidy',
     benefitAmount: '₹2.67 lakh subsidy',
@@ -151,11 +150,12 @@ export const schemes = [
   {
     id: 'mudra-loan',
     schemeId: 'mudra-loan',
-    name: 'Pradhan Mantri MUDRA Yojana',
+    name: 'Mudra Loan',
     provider: 'Ministry of Finance / MUDRA',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'entrepreneurship',
+    category: schemeCategoryMap['mudra loan'] || 'entrepreneurship',
+    tags: schemeTagsMap['mudra loan'] || [],
     matchScore: 83,
     benefitSummary: 'Loans up to ₹10 lakh for small micro-enterprises and entrepreneurs',
     benefitAmount: 'Up to ₹10 lakh',
@@ -192,11 +192,12 @@ export const schemes = [
   {
     id: 'stand-up-india',
     schemeId: 'stand-up-india',
-    name: 'Stand Up India Scheme',
+    name: 'Stand Up India',
     provider: 'Department of Financial Services',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'entrepreneurship',
+    category: schemeCategoryMap['stand up india'] || 'entrepreneurship',
+    tags: schemeTagsMap['stand up india'] || [],
     matchScore: 80,
     benefitSummary: 'Bank loans between ₹10 lakh and ₹1 Crore for greenfield enterprises',
     benefitAmount: '₹10L - ₹1Cr',
@@ -232,21 +233,22 @@ export const schemes = [
   {
     id: 'pm-scholarship',
     schemeId: 'pm-scholarship',
-    name: 'Post-Matric Scholarship for SC Students',
+    name: 'National Scholarship',
     provider: 'Ministry of Social Justice',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'scholarships',
+    category: schemeCategoryMap['national scholarship'] || 'scholarships',
+    tags: schemeTagsMap['national scholarship'] || [],
     matchScore: 92,
     benefitSummary: 'Up to ₹50,000 per year for tuition and maintenance',
     benefitAmount: '₹50,000/year',
     deadline: '31 Oct 2026',
     applicationMethod: 'Online portal',
     processingTime: '60-90 days',
-    shortExplanation: 'Financial support for higher education of students from Scheduled Caste communities.',
-    overview: 'The Post-Matric Scholarship provides financial assistance to students belonging to Scheduled Castes for pursuing post-matriculation studies.',
+    shortExplanation: 'Financial support for higher education of students from target communities.',
+    overview: 'The National Scholarship provides financial assistance to students belonging to targeted communities for pursuing post-matriculation studies.',
     eligibility: [
-      'Must belong to Scheduled Caste category',
+      'Must belong to targeted category',
       'Annual family income below ₹2.5 lakh',
       'Studying in a recognized post-matriculation course',
     ],
@@ -255,7 +257,7 @@ export const schemes = [
       'Maintenance allowance of ₹1,200/month',
     ],
     documentsRequired: [
-      'Caste Certificate', 'Income Certificate', 'Mark sheets', 'Aadhaar Card',
+      'Category Certificate', 'Income Certificate', 'Mark sheets', 'Aadhaar Card',
     ],
     applicationProcess: [
       'Register on National Scholarship Portal',
@@ -269,11 +271,12 @@ export const schemes = [
   {
     id: 'pm-kisan',
     schemeId: 'pm-kisan',
-    name: 'PM-KISAN Samman Nidhi',
+    name: 'PM Kisan',
     provider: 'Ministry of Agriculture',
     providerType: 'government',
     verification: 'government_verified',
-    category: 'agriculture',
+    category: schemeCategoryMap['pm kisan'] || 'agriculture',
+    tags: schemeTagsMap['pm kisan'] || [],
     matchScore: 85,
     benefitSummary: '₹6,000 per year in three installments for farmers',
     benefitAmount: '₹6,000/year',
@@ -301,240 +304,37 @@ export const schemes = [
       { label: 'Location matches', status: 'match' },
       { label: 'Occupation matches (Farmer)', status: 'match' },
     ],
-  },
-  {
-    id: 'tata-skill-dev',
-    schemeId: 'tata-skill-dev',
-    name: 'TATA Skills Development Program',
-    provider: 'TATA Trusts',
-    providerType: 'csr',
-    verification: 'csr_verified',
-    category: 'employment',
-    matchScore: 79,
-    benefitSummary: 'Free skill training with stipend up to ₹8,000/month',
-    benefitAmount: '₹8,000/month stipend',
-    deadline: '15 Sep 2026',
-    applicationMethod: 'Online application',
-    processingTime: '15-20 days',
-    shortExplanation: 'CSR-funded skill development program offering vocational training and job placement support.',
-    overview: 'The TATA Skills Development Program is a CSR initiative providing vocational training to youth from economically weaker sections.',
-    eligibility: [
-      'Age 18-35 years',
-      'Annual family income below ₹3 lakh',
-    ],
-    benefits: [
-      'Free 6-month vocational training',
-      'Monthly stipend of ₹8,000',
-    ],
-    documentsRequired: [
-      'Aadhaar Card', 'Educational certificates', 'Income proof',
-    ],
-    applicationProcess: [
-      'Apply online through TATA Trusts portal',
-    ],
-    matchReasons: [
-      { label: 'Location matches', status: 'match' },
-      { label: 'Skill growth matches', status: 'match' },
-    ],
-  },
-  {
-    id: 'mgnrega',
-    schemeId: 'mgnrega',
-    name: 'MGNREGA Employment Guarantee',
-    provider: 'Ministry of Rural Development',
-    providerType: 'government',
-    verification: 'government_verified',
-    category: 'employment',
-    matchScore: 81,
-    benefitSummary: '100 days of guaranteed wage employment per year',
-    benefitAmount: '₹220/day (state rates vary)',
-    deadline: 'Rolling enrollment',
-    applicationMethod: 'Local Gram Panchayat',
-    processingTime: '15 days',
-    shortExplanation: 'Legal guarantee of 100 days of wage employment per year to rural households.',
-    overview: 'The Mahatma Gandhi National Rural Employment Guarantee Act provides a legal guarantee of 100 days of wage employment per year.',
-    eligibility: [
-      'Rural household',
-      'Adult members willing to do unskilled manual work',
-    ],
-    benefits: [
-      '100 days of guaranteed work per year',
-      'Minimum wage as per state rates',
-    ],
-    documentsRequired: [
-      'Aadhaar Card', 'Residence proof', 'Photograph',
-    ],
-    applicationProcess: [
-      'Submit application to Gram Panchayat',
-    ],
-    matchReasons: [
-      { label: 'Location matches', status: 'match' },
-      { label: 'Occupation matches (Daily wage)', status: 'match' },
-    ],
-  },
-  {
-    id: 'sukanya-samriddhi',
-    schemeId: 'sukanya-samriddhi',
-    name: 'Sukanya Samriddhi Yojana (SSY)',
-    provider: 'Ministry of Women & Child Development / India Post',
-    providerType: 'government',
-    verification: 'government_verified',
-    category: 'women',
-    tags: ['women', 'children', 'financial-assistance'],
-    matchScore: 94,
-    benefitSummary: 'High-interest tax-free savings scheme for girl child education & welfare (8.2% p.a.)',
-    benefitAmount: 'Up to ₹1.5L/yr tax exemption + 8.2% Interest',
-    deadline: 'Rolling enrollment',
-    applicationMethod: 'Post Office / Bank Branches',
-    processingTime: '1-3 days',
-    shortExplanation: 'Small deposit scheme backed by Govt of India dedicated to securing the financial future and education of girl children.',
-    overview: 'Sukanya Samriddhi Yojana is a small savings scheme launched under Beti Bachao Beti Padhao campaign. It offers high tax-free interest rates and long-term financial security for girls up to 10 years of age.',
-    eligibility: [
-      'Girl child resident of India aged below 10 years',
-      'Maximum 2 girl child accounts per family',
-      'Parent or legal guardian can open account',
-    ],
-    benefits: [
-      '8.2% per annum compound interest rate (quarterly revised)',
-      'Section 80C tax deduction benefits up to ₹1.5 Lakh per year',
-      'Partial withdrawal up to 50% for higher education after age 18',
-    ],
-    documentsRequired: [
-      'Birth certificate of Girl Child', 'Identity & Address proof of Parent/Guardian', 'Aadhaar Card',
-    ],
-    applicationProcess: [
-      'Visit nearest Post Office or authorized Commercial Bank branch',
-      'Fill SSY Account Opening Form',
-      'Submit birth certificate and guardian KYC documents',
-      'Deposit initial opening amount (min ₹250)',
-    ],
-    matchReasons: [
-      { label: 'Targeted for Women & Girl Child Empowerment', status: 'match' },
-      { label: 'Government Tax-Exempt Backed', status: 'match' },
-    ],
-  },
-  {
-    id: 'poshan-abhiyaan',
-    schemeId: 'poshan-abhiyaan',
-    name: 'PM POSHAN Abhiyaan (National Nutrition Mission)',
-    provider: 'Ministry of Education & MWCD',
-    providerType: 'government',
-    verification: 'government_verified',
-    category: 'children',
-    tags: ['children', 'healthcare', 'education'],
-    matchScore: 90,
-    benefitSummary: 'Free hot nutritious meals & health monitoring for school students & infants',
-    benefitAmount: '100% Free Daily Meals & Supplements',
-    deadline: 'Ongoing Scheme',
-    applicationMethod: 'Government Schools / Anganwadi Centers',
-    processingTime: 'Immediate',
-    shortExplanation: 'Flagship national program ensuring child nutrition, growth tracking, and healthy development in schools and Anganwadis.',
-    overview: 'PM POSHAN provides nutritious cooked meals to over 12 crore children studying in Classes I to VIII in government and government-aided schools across India.',
-    eligibility: [
-      'Children enrolled in government/government-aided schools',
-      'Infants and pregnant/lactating mothers registered at Anganwadis',
-    ],
-    benefits: [
-      'Nutritious daily meals meeting mandated calorie & protein standards',
-      'Free micronutrient supplementation & health check-ups',
-      'Reduces malnutrition and boosts school attendance',
-    ],
-    documentsRequired: [
-      'School Admission Record or Anganwadi Registration', 'Aadhaar Card',
-    ],
-    applicationProcess: [
-      'Automatic enrollment upon admission to government/aided school or Anganwadi',
-    ],
-    matchReasons: [
-      { label: 'Child Growth & Health Priority', status: 'match' },
-      { label: 'Universal School Nutrition Coverage', status: 'match' },
-    ],
-  },
-  {
-    id: 'pmvvya',
-    schemeId: 'pmvvya',
-    name: 'Pradhan Mantri Vaya Vandana Yojana (PMVVYA)',
-    provider: 'LIC of India / Ministry of Finance',
-    providerType: 'government',
-    verification: 'government_verified',
-    category: 'senior-citizens',
-    tags: ['senior-citizens', 'financial-assistance', 'healthcare'],
-    matchScore: 93,
-    benefitSummary: 'Guaranteed pension scheme for senior citizens aged 60+ with fixed 7.4% returns',
-    benefitAmount: '₹1,000 to ₹9,250/month pension',
-    deadline: 'Rolling',
-    applicationMethod: 'LIC Branch / Online',
-    processingTime: '7 days',
-    shortExplanation: 'Pension scheme exclusively for senior citizens offering guaranteed payout for 10 years.',
-    overview: 'Pradhan Mantri Vaya Vandana Yojana provides social security and monthly income to senior citizens against market volatility through guaranteed annual returns.',
-    eligibility: [
-      'Must be a senior citizen of India aged 60 years or above',
-      'No upper age limit for entry',
-    ],
-    benefits: [
-      'Assured return of 7.4% per annum payable monthly',
-      '10-year policy term with pension payout choice (Monthly/Quarterly/Annual)',
-      'Loan facility up to 75% of purchase price after 3 policy years',
-    ],
-    documentsRequired: [
-      'Aadhaar Card', 'PAN Card', 'Proof of Age', 'Bank Account details',
-    ],
-    applicationProcess: [
-      'Visit LIC office or apply via LIC India online portal',
-      'Select lump-sum investment purchase price',
-      'Receive regular automated pension directly in bank account',
-    ],
-    matchReasons: [
-      { label: 'Senior Citizen Age Eligibility Met', status: 'match' },
-      { label: 'Guaranteed Govt Security', status: 'match' },
-    ],
-  },
-  {
-    id: 'adip-disability',
-    schemeId: 'adip-disability',
-    name: 'ADIP Scheme (Assistance to Disabled Persons)',
-    provider: 'Department of Empowerment of Persons with Disabilities',
-    providerType: 'government',
-    verification: 'government_verified',
-    category: 'disability-support',
-    tags: ['disability-support', 'healthcare', 'financial-assistance'],
-    matchScore: 92,
-    benefitSummary: 'Free distribution of modern aids, motorized tricycles & hearing aids for Divyangjan',
-    benefitAmount: '100% Subsidized Assistive Equipment',
-    deadline: 'Rolling Camps & Online',
-    applicationMethod: 'ALIMCO Camps / Online Portal',
-    processingTime: '15-30 days',
-    shortExplanation: 'Assistance scheme for persons with disabilities to obtain modern durable aids and appliances.',
-    overview: 'ADIP scheme assists needy persons with disabilities in procuring durable, sophisticated, and scientifically manufactured aids and appliances to promote physical, social, and psychological rehabilitation.',
-    eligibility: [
-      'Indian citizen with 40% or more certified disability',
-      'Monthly income from all sources not exceeding ₹30,000',
-    ],
-    benefits: [
-      'Free motorized tricycles, wheelchairs, hearing aids & prosthetics',
-      'Coverage of fitting expenses and travel costs to assessment camps',
-    ],
-    documentsRequired: [
-      'Disability Certificate (UDID)', 'Income Certificate', 'Aadhaar Card', 'Passport Photograph',
-    ],
-    applicationProcess: [
-      'Register at ALIMCO distribution camp or state disability welfare office',
-      'Submit UDID card and income proof for assessment',
-      'Receive custom-fitted assistive aid free of charge',
-    ],
-    matchReasons: [
-      { label: '100% Disability Support Priority', status: 'match' },
-      { label: 'UDID Verified Assistance', status: 'match' },
-    ],
-  },
-  ...extraSchemes
+  }
 ];
 
+export const schemes = baseSchemes.filter(s => Object.keys(schemeCategoryMap).includes(s.name.toLowerCase()));
+
+const getSchemeCountsForCategory = (catId) => {
+  return schemes.filter(s => s.category === catId || (s.tags && s.tags.includes(catId))).length;
+};
+
+export const categories = [
+  { id: 'education', name: 'Education', description: 'Scholarships, fee waivers, and education support', icon: 'GraduationCap', schemeCount: getSchemeCountsForCategory('education') },
+  { id: 'women', name: 'Women', description: 'Welfare and empowerment programs for women', icon: 'Heart', schemeCount: getSchemeCountsForCategory('women') },
+  { id: 'children', name: 'Children', description: 'Child nutrition, protection, and development', icon: 'Baby', schemeCount: getSchemeCountsForCategory('children') },
+  { id: 'senior-citizens', name: 'Senior Citizens', description: 'Pension and healthcare for elderly citizens', icon: 'Users', schemeCount: getSchemeCountsForCategory('senior-citizens') },
+  { id: 'healthcare', name: 'Healthcare', description: 'Health insurance and medical assistance', icon: 'Stethoscope', schemeCount: getSchemeCountsForCategory('healthcare') },
+  { id: 'disability-support', name: 'Disability Support', description: 'Disability pensions and accessibility programs', icon: 'Accessibility', schemeCount: getSchemeCountsForCategory('disability-support') },
+  { id: 'agriculture', name: 'Agriculture', description: 'Farmer support, crop insurance, and subsidies', icon: 'Wheat', schemeCount: getSchemeCountsForCategory('agriculture') },
+  { id: 'employment', name: 'Employment', description: 'Job training and employment guarantee schemes', icon: 'Briefcase', schemeCount: getSchemeCountsForCategory('employment') },
+  { id: 'housing', name: 'Housing', description: 'Affordable housing and shelter programs', icon: 'Home', schemeCount: getSchemeCountsForCategory('housing') },
+  { id: 'financial-assistance', name: 'Financial Assistance', description: 'Direct benefit transfers and financial aid', icon: 'Wallet', schemeCount: getSchemeCountsForCategory('financial-assistance') },
+  { id: 'entrepreneurship', name: 'Entrepreneurship', description: 'Startup loans and business development support', icon: 'Rocket', schemeCount: getSchemeCountsForCategory('entrepreneurship') },
+  { id: 'scholarships', name: 'Scholarships', description: 'Merit and need-based scholarship programs', icon: 'Award', schemeCount: getSchemeCountsForCategory('scholarships') },
+];
+
+// We replaced the entire block below down to extraSchemes.
+// I need to keep applications, documents, benefits, etc.
 export const applications = [
   {
     id: 'app-001',
     schemeId: 'pm-scholarship',
-    schemeName: 'Post-Matric Scholarship for SC Students',
+    schemeName: 'National Scholarship',
     provider: 'Ministry of Social Justice',
     providerType: 'government',
     verification: 'government_verified',

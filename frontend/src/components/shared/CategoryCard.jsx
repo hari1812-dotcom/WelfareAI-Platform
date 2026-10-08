@@ -11,35 +11,9 @@ const iconMap = {
   entrepreneurship: Rocket, scholarships: Award,
 };
 
-function getExpandedSchemesCount(categoryId) {
-  const categoryMatchMap = {
-    'education': ['education', 'scholarships'],
-    'scholarships': ['scholarships', 'education'],
-    'women': ['women', 'children', 'entrepreneurship'],
-    'children': ['children', 'education', 'healthcare', 'women'],
-    'senior-citizens': ['senior-citizens', 'financial-assistance', 'healthcare'],
-    'healthcare': ['healthcare', 'children', 'senior-citizens', 'disability-support'],
-    'disability-support': ['disability-support', 'financial-assistance', 'healthcare'],
-    'agriculture': ['agriculture', 'financial-assistance'],
-    'employment': ['employment', 'scholarships', 'entrepreneurship'],
-    'housing': ['housing'],
-    'financial-assistance': ['financial-assistance', 'senior-citizens', 'agriculture', 'women', 'disability-support'],
-    'entrepreneurship': ['entrepreneurship', 'employment', 'financial-assistance']
-  };
-
-  const selLower = (categoryId || '').toLowerCase();
-  const matchedCategories = categoryMatchMap[selLower] || [selLower];
-
-  return schemes.filter((s) => {
-    const cat = (s.category || '').toLowerCase();
-    const tags = (s.tags || []).map((t) => t.toLowerCase());
-    return cat === selLower || matchedCategories.includes(cat) || tags.some((t) => matchedCategories.includes(t));
-  }).length;
-}
-
 export function CategoryCard({ category, onClick }) {
   const Icon = iconMap[category.id] || Award;
-  const dynamicCount = getExpandedSchemesCount(category.id);
+  const dynamicCount = category.schemeCount;
   return (
     <Link to={`/category/${category.id}`} className="block group text-left h-full" onClick={onClick}>
       <Card className="p-5 h-full transition-all duration-200 group-hover:border-primary-400 group-hover:shadow-md cursor-pointer flex flex-col justify-between" hover>

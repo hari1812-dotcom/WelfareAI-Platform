@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Upload, FolderOpen, CheckCircle2, AlertCircle, RefreshCw, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Upload, FolderOpen, CheckCircle2, AlertCircle, RefreshCw, Filter, LogIn } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DocumentCard } from '@/components/shared/DocumentCard';
 import { DocumentPreviewModal } from '@/components/shared/DocumentPreviewModal';
@@ -42,8 +43,10 @@ function getInitialDocuments() {
 
 export function DocumentsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [docList, setDocList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notLoggedIn, setNotLoggedIn] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   
   // Modals state
@@ -71,21 +74,42 @@ export function DocumentsPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return token && token !== 'demo-token';
+  };
+
   const loadDocuments = async () => {
     setLoading(true);
+    setNotLoggedIn(false);
+    if (!isAuthenticated()) {
+      // User is not logged in — show a login prompt, not mock data
+      setDocList([]);
+      setNotLoggedIn(true);
+      setLoading(false);
+      return;
+    }
     try {
       const data = await getDocumentsApi();
       if (data.documents && data.documents.length > 0) {
         setDocList(data.documents);
         localStorage.setItem(INITIAL_DOCS_KEY, JSON.stringify(data.documents));
       } else {
-        const local = getInitialDocuments();
-        setDocList(local);
+        setDocList([]);
       }
     } catch (err) {
-      // Backend unauthenticated or offline fallback
-      const local = getInitialDocuments();
-      setDocList(local);
+      // Backend offline — try local cache only (real user's cached docs)
+      try {
+        const saved = localStorage.getItem(INITIAL_DOCS_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setDocList(parsed);
+        } else {
+          setDocList([]);
+        }
+      } catch (e) {
+        setDocList([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -268,7 +292,14 @@ export function DocumentsPage() {
         </div>
 
         <Button
-          onClick={() => { setEditingDoc(null); setShowUploadModal(true); }}
+          onClick={() => {
+            if (!isAuthenticated()) {
+              navigate('/login', { state: { from: '/documents' } });
+              return;
+            }
+            setEditingDoc(null);
+            setShowUploadModal(true);
+          }}
           className="gap-2 shadow-sm shrink-0"
         >
           <Upload className="h-4 w-4" />
@@ -282,6 +313,28 @@ export function DocumentsPage() {
           {[1, 2, 3, 4].map((n) => (
             <div key={n} className="h-24 animate-pulse rounded-xl bg-gray-200" />
           ))}
+        </div>
+      ) : notLoggedIn ? (
+        <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white py-16 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100">
+            <LogIn className="h-8 w-8 text-primary-600" />
+          </div>
+          <h3 className="mt-4 text-lg font-bold text-navy-900">
+            {t('loginToUpload', { defaultValue: 'Log in to access your documents' })}
+          </h3>
+          <p className="mt-2 text-sm text-gray-500 max-w-xs mx-auto">
+            {t('loginToUploadDesc', { defaultValue: 'Sign in to securely upload, manage and verify your government documents.' })}
+          </p>
+          <Button onClick={() => navigate('/login', { state: { from: '/documents' } })} className="mt-6 gap-2">
+            <LogIn className="h-4 w-4" />
+            {t('login', { defaultValue: 'Sign In' })}
+          </Button>
+          <p className="mt-3 text-xs text-gray-400">
+            {t('noAccount', { defaultValue: "Don't have an account?" })}{' '}
+            <a href="/register" className="text-primary-600 font-semibold hover:underline">
+              {t('signUp', { defaultValue: 'Register here' })}
+            </a>
+          </p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-gray-200 bg-white py-16 text-center shadow-xs">

@@ -116,3 +116,139 @@ export const getAllSchemes = async (req, res) => {
     res.status(500).json({ message: 'Failed to get schemes' });
   }
 };
+
+async function getEligibleList(profile) {
+  const userState = profile.state;
+  const userAge = profile.age ? parseInt(profile.age, 10) : profile.age;
+  const userOcc = (profile.occupation || '').toLowerCase();
+  const userIncome = profile.annualIncomeINR || profile.income;
+
+  if (!userState) {
+    const allSchemes = await Scheme.find();
+    return allSchemes.map(s => s.schemeId);
+  }
+
+  const matchCriteria = { State: userState };
+  if (userAge) {
+    matchCriteria.Age = { $gte: userAge - 15, $lte: userAge + 15 };
+  }
+
+  let eligibleRecords = await SchemeEligibility.find(matchCriteria).limit(200);
+
+  if (eligibleRecords.length === 0) {
+    const broaderCriteria = { State: userState };
+    eligibleRecords = await SchemeEligibility.find(broaderCriteria).limit(200);
+  }
+
+  const eligibleSchemeNames = [...new Set(eligibleRecords.map(r => r.Eligible_Scheme))];
+  const schemeIdMap = {
+    'National Scholarship': 'pm-scholarship',
+    'Ayushman Bharat': 'ayushman-bharat',
+    'PM Kisan': 'pm-kisan',
+    'PM Awas Yojana': 'pmay-housing',
+    'Atal Pension Yojana': 'atal-pension-yojana',
+    'Mudra Loan': 'mudra-loan',
+    'Stand Up India': 'stand-up-india'
+  };
+
+  const matchedSchemeIds = eligibleSchemeNames.map(n => schemeIdMap[n]).filter(Boolean);
+  let uniqueSchemeIds = [...new Set(matchedSchemeIds)];
+
+  let schemes = await Scheme.find({ schemeId: { $in: uniqueSchemeIds } });
+  if (schemes.length === 0) {
+    schemes = await Scheme.find();
+  }
+
+  const filteredSchemes = schemes.filter((s) => {
+    if (userOcc.includes('salaried') && (s.schemeId === 'pm-kisan' || s.schemeId === 'pm-scholarship')) {
+      return false;
+    }
+    if (userOcc.includes('student') && s.schemeId === 'pm-kisan') {
+      return false;
+    }
+    return true;
+  });
+
+  return filteredSchemes.map(s => s.schemeId);
+}
+
+export const simulateSchemes = async (req, res) => {
+  try {
+    const user = req.user;
+    const simulatedProfile = req.body;
+
+    const currentEligibleIds = await getEligibleList(user);
+    const simulatedEligibleIds = await getEligibleList(simulatedProfile);
+
+    const allSchemes = await Scheme.find();
+    
+    let currentEligibleCount = 0;
+    let simulatedEligibleCount = 0;
+    let newOpportunitiesCount = 0;
+    const newOpportunities = [];
+    const lostEligibilities = [];
+    const schemesList = [];
+
+    for (const scheme of allSchemes) {
+      const isCurrentEligible = currentEligibleIds.includes(scheme.schemeId);
+      const isSimulatedEligible = simulatedEligibleIds.includes(scheme.schemeId);
+      
+      if (isCurrentEligible) currentEligibleCount++;
+      if (isSimulatedEligible) simulatedEligibleCount++;
+
+      let changeType = 'unchanged';
+      let changeExplanation = 'No change in eligibility';
+
+      if (!isCurrentEligible && isSimulatedEligible) {
+        changeType = 'new_opportunity';
+        changeExplanation = 'You meet the new criteria based on updated profile';
+        newOpportunitiesCount++;
+        newOpportunities.push({
+          schemeId: scheme.schemeId,
+          name: scheme.name,
+          benefitSummary: scheme.benefitSummary
+        });
+      } else if (isCurrentEligible && !isSimulatedEligible) {
+        changeType = 'lost_eligibility';
+        changeExplanation = 'You no longer meet the criteria with the updated profile';
+        lostEligibilities.push({
+          schemeId: scheme.schemeId,
+          name: scheme.name,
+          changeExplanation
+        });
+      }
+
+      schemesList.push({
+        schemeId: scheme.schemeId,
+        name: scheme.name,
+        provider: scheme.provider || 'Govt of India',
+        benefitSummary: scheme.benefitSummary,
+        current: {
+          isEligible: isCurrentEligible,
+          reason: isCurrentEligible ? 'Eligible based on current profile' : 'Does not match current profile criteria'
+        },
+        simulated: {
+          isEligible: isSimulatedEligible,
+          reason: isSimulatedEligible ? 'Eligible based on simulated profile' : 'Does not match simulated profile criteria'
+        },
+        changeType,
+        changeExplanation
+      });
+    }
+
+    res.json({
+      currentProfile: user,
+      summary: {
+        currentEligibleCount,
+        simulatedEligibleCount,
+        newOpportunitiesCount
+      },
+      schemes: schemesList,
+      newOpportunities,
+      lostEligibilities
+    });
+  } catch (error) {
+    console.error('Error simulating schemes:', error);
+    res.status(500).json({ message: 'Failed to simulate schemes' });
+  }
+};

@@ -5,7 +5,8 @@ const schema = new mongoose.Schema({
   Annual_Income_INR: Number,
   State: String,
   Category: String,
-  Eligible_Scheme: String
+  Eligible_Scheme: String,
+  Scheme_Category: String
 });
 
 export const SchemeEligibility = mongoose.model('SchemeEligibility', schema);

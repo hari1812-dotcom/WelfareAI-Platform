@@ -36,6 +36,11 @@ export function RegisterPage() {
     try {
       const { token, user } = await registerCitizen(citizenData);
       localStorage.setItem('token', token);
+      if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+      // Persist the chosen language
+      localStorage.setItem('userLanguage', language);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

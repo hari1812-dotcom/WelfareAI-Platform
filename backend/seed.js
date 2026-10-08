@@ -123,7 +123,7 @@ const seedData = async () => {
     await Scheme.insertMany(originalSchemes);
     console.log('Schemes inserted successfully');
 
-    let rawData = fs.readFileSync('c:/Users/user/Desktop/WelfareAI-Platform/frontend/src/data/dataset.json');
+    let rawData = fs.readFileSync('c:/Users/user/Desktop/WelfareAI-Platform/frontend/src/data/dataset_with_scheme_categories.json');
     let dataset = JSON.parse(rawData);
     
     // cast numbers
@@ -132,7 +132,8 @@ const seedData = async () => {
       Annual_Income_INR: Number(row.Annual_Income_INR),
       State: row.State,
       Category: row.Category,
-      Eligible_Scheme: row.Eligible_Scheme
+      Eligible_Scheme: row.Eligible_Scheme,
+      Scheme_Category: row.Scheme_Category
     }));
 
     await SchemeEligibility.insertMany(dataset);
