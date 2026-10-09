@@ -69,8 +69,9 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email?.toLowerCase().trim();
     
-    const citizen = await Citizen.findOne({ email }).select('+password');
+    const citizen = await Citizen.findOne({ email: normalizedEmail }).select('+password');
     if (!citizen || !(await citizen.comparePassword(password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
