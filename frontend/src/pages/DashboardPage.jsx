@@ -12,10 +12,11 @@ import { useEffect, useState } from "react";
 import { DashboardCard } from "@/components/shared/DashboardCard";
 import { SchemeCard } from "@/components/shared/SchemeCard";
 import { Card } from "@/components/ui/Card";
-import { applications, benefits, documents } from "@/data/mockData";
+import { documents } from "@/data/mockData";
 import { getDashboardData, getMe } from "@/services/api";
 import { useTranslation } from "react-i18next";
 import { getPersonalizedSchemeRecommendations } from "@/data/myschemeDataset";
+import { useApplicationTracking } from "@/contexts/useApplicationTracking";
 
 export function DashboardPage() {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export function DashboardPage() {
   const [dashboardData, setDashboardData] = useState(null);
   const [user, setUser] = useState(null);
   const [schemes, setSchemes] = useState([]);
+  const { applications } = useApplicationTracking();
 
   useEffect(() => {
     async function loadData() {
@@ -82,14 +84,14 @@ export function DashboardPage() {
         />
         <DashboardCard
           label={t('dashboard.activeApplications')}
-          value={dashboardData?.pendingApplications || applications.length}
+          value={applications.length}
           icon={FileText}
           color="accent"
         />
         <DashboardCard
           label={t('dashboard.benefitsReceived')}
-          value={`₹${(dashboardData?.benefitsReceived || benefits
-            .reduce((s, b) => s + b.receivedAmount, 0))
+          value={`₹${applications
+            .reduce((total, application) => total + (Number(application.benefitReceived) || 0), 0)
             .toLocaleString("en-IN")}`}
           icon={Wallet}
           color="success"

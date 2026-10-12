@@ -8,10 +8,10 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { VerificationBadge } from '@/components/shared/VerificationBadge';
 import { MatchScore } from '@/components/shared/MatchScore';
+import { ApplyNowButton } from '@/components/shared/ApplyNowButton';
 import { schemes } from '@/data/mockData';
 import { getAllSchemes } from '@/services/api';
 import { getSchemeTranslation } from '@/data/schemeTranslations';
-import { getSchemeApplicationUrl } from '@/utils/schemeLinks';
 import { loadMyschemeSchemes } from '@/data/myschemeDataset';
 
 const schemeTranslationKeys = { 'pm-scholarship': 'pmScholarship', 'ayushman-bharat': 'ayushmanBharat', 'pm-kisan': 'pmKisan', 'pmay-housing': 'pmayHousing', 'atal-pension-yojana': 'atalPension', 'mudra-loan': 'mudraLoan', 'stand-up-india': 'standUpIndia', mgnrega: 'mgnrega', 'tata-skills': 'tataSkills' };
@@ -86,7 +86,6 @@ export function SchemeDetailsPage() {
   }
 
   const schemeId = scheme.schemeId || scheme.id;
-  const applicationUrl = getSchemeApplicationUrl(scheme);
   const translated = getSchemeTranslation(schemeId, i18n.language, scheme);
   const translateScheme = (value) => t(`schemeData.${value}`, { defaultValue: value || '' });
   const name = translated.name || t(`schemeNames.${schemeTranslationKeys[schemeId] || schemeId}`, { defaultValue: translateScheme(scheme.name) });
@@ -124,7 +123,7 @@ export function SchemeDetailsPage() {
         </div>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
           {!scheme.myschemeSlug && <Button to={`/schemes/${schemeId}/eligibility`} size="lg" className="flex-1">{t('scheme.checkEligibility')} <ArrowRight className="h-5 w-5" /></Button>}
-          <Button href={applicationUrl || undefined} disabled={!applicationUrl} title={!applicationUrl ? 'Application website is not provided in the scheme data.' : undefined} target="_blank" rel="noopener noreferrer" variant="outline" size="lg" className="flex-1">{applicationUrl ? t('scheme.apply') : 'Apply link unavailable'} <ExternalLink className="h-4 w-4" /></Button>
+          <ApplyNowButton scheme={scheme} variant="outline" size="lg" className="flex-1">{t('scheme.apply')} <ExternalLink className="h-4 w-4" /></ApplyNowButton>
         </div>
       </div>
 

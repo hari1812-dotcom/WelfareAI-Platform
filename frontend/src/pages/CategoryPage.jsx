@@ -8,6 +8,7 @@ import {
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
+import { ApplyNowButton } from '@/components/shared/ApplyNowButton';
 import { Card } from '@/components/ui/Card';
 import { myschemeCategories } from '@/data/myschemeCategories';
 import { loadMyschemeSchemes } from '@/data/myschemeDataset';
@@ -258,7 +259,6 @@ export function CategoryPage() {
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {pagedSchemes.map(scheme => {
-                const applicationUrl = getSchemeApplicationUrl(scheme);
                 return (
                 <Card
                   key={scheme.id}
@@ -312,9 +312,9 @@ export function CategoryPage() {
                     <Button to={`/schemes/${scheme.schemeId || scheme.id}`} variant="outline" size="sm" className="flex-1 justify-center text-xs">
                       Details
                     </Button>
-                    <Button href={applicationUrl || undefined} disabled={!applicationUrl} title={!applicationUrl ? 'Application website is not provided in the scheme data.' : undefined} target="_blank" rel="noopener noreferrer" variant="primary" size="sm" className="flex-1 justify-center gap-1 text-xs shadow-xs">
-                      {applicationUrl ? 'Apply' : 'Apply link unavailable'} <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
+                    <ApplyNowButton scheme={scheme} variant="primary" size="sm" className="flex-1 justify-center gap-1 text-xs shadow-xs">
+                      Apply <ArrowRight className="h-3.5 w-3.5" />
+                    </ApplyNowButton>
                   </div>
                 </Card>
                 );

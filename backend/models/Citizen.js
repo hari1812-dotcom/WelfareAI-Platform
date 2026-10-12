@@ -82,6 +82,17 @@ const citizenSchema = new mongoose.Schema(
       type: Number,
       min: 0,
     },
+    applications: [
+      {
+        _id: false,
+        schemeId: { type: String, required: true, trim: true },
+        schemeName: { type: String, required: true, trim: true },
+        provider: { type: String, default: '', trim: true },
+        status: { type: String, enum: ['applied'], default: 'applied' },
+        appliedAt: { type: Date, default: Date.now },
+        benefitReceived: { type: Number, min: 0, default: 0 },
+      },
+    ],
   },
   {
     timestamps: true,

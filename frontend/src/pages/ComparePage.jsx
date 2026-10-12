@@ -10,11 +10,11 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { MatchScore } from '@/components/shared/MatchScore';
+import { ApplyNowButton } from '@/components/shared/ApplyNowButton';
 import { VerificationBadge } from '@/components/shared/VerificationBadge';
 import { getMe, getAllSchemes } from '@/services/api';
 import { schemes as mockSchemes } from '@/data/mockData';
 import { useTranslation } from 'react-i18next';
-import { getSchemeApplicationUrl } from '@/utils/schemeLinks';
 
 export function ComparePage() {
   const { t } = useTranslation();
@@ -454,16 +454,15 @@ export function ComparePage() {
                     <td className="p-4 font-bold text-navy-800">Actions</td>
                     {selectedSchemes.map((s) => {
                       const sid = s.id || s.schemeId;
-                      const applicationUrl = getSchemeApplicationUrl(s);
                       return (
                         <td key={sid} className="p-4">
                           <div className="flex flex-col gap-2">
                             <Button to={`/schemes/${sid}`} variant="primary" size="sm" className="w-full justify-center">
                               View Details
                             </Button>
-                            <Button href={applicationUrl || undefined} disabled={!applicationUrl} title={!applicationUrl ? 'Application website is not provided in the scheme data.' : undefined} target="_blank" rel="noopener noreferrer" variant="outline" size="sm" className="w-full justify-center gap-1">
-                              {applicationUrl ? 'Apply Now' : 'Apply link unavailable'} <ArrowRight className="h-3.5 w-3.5" />
-                            </Button>
+                            <ApplyNowButton scheme={s} variant="outline" size="sm" className="w-full justify-center gap-1">
+                              Apply Now <ArrowRight className="h-3.5 w-3.5" />
+                            </ApplyNowButton>
                           </div>
                         </td>
                       );

@@ -8,10 +8,10 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { ApplyNowButton } from '@/components/shared/ApplyNowButton';
 import { getMe } from '@/services/api';
 import { applications } from '@/data/mockData';
 import { useTranslation } from 'react-i18next';
-import { getSchemeApplicationUrl } from '@/utils/schemeLinks';
 import { getPersonalizedSchemeRecommendations } from '@/data/myschemeDataset';
 import { myschemeCategories } from '@/data/myschemeCategories';
 
@@ -398,7 +398,6 @@ export function MySchemesPage() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSchemes.map((scheme) => {
             const sid = scheme.schemeId || scheme.id;
-            const applicationUrl = getSchemeApplicationUrl(scheme);
             const tierInfo = getMatchTier(scheme.matchScore ?? 0);
 
             // Check if user has applied
@@ -465,9 +464,9 @@ export function MySchemesPage() {
                   <Button to={`/schemes/${sid}`} state={{ recommendation: { matchScore: scheme.matchScore, matchScoreLabel: scheme.matchScoreLabel, matchTier: scheme.matchTier, matchReasons: scheme.matchReasons, recommendationNote: scheme.recommendationNote } }} variant="outline" size="sm" className="flex-1 justify-center">
                     View Details
                   </Button>
-                  <Button href={applicationUrl || undefined} disabled={!applicationUrl} title={!applicationUrl ? 'Application website is not provided in the scheme data.' : undefined} target="_blank" rel="noopener noreferrer" variant="primary" size="sm" className="flex-1 justify-center gap-1">
-                    {applicationUrl ? 'Apply Now' : 'Apply link unavailable'} <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  <ApplyNowButton scheme={scheme} variant="primary" size="sm" className="flex-1 justify-center gap-1">
+                    Apply Now <ArrowRight className="h-4 w-4" />
+                  </ApplyNowButton>
                 </div>
               </Card>
             );

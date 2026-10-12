@@ -14,12 +14,17 @@ const knownJurisdictions = [
 ];
 
 const occupationTerms = {
-  agriculture: ['farmer', 'agriculturist', 'cultivator', 'agricultural worker'],
-  business: ['entrepreneur', 'self-employed', 'business owner', 'micro enterprise'],
-  fisherman: ['fisherman', 'fisherwoman', 'fisherfolk'],
+  agriculture: ['farmer', 'farmers', 'grower', 'agriculturist', 'cultivator', 'agricultural worker', 'agricultural labourer', 'agricultural laborer'],
+  business: ['entrepreneur', 'self-employed', 'business owner', 'micro enterprise', 'shop owner', 'retail owner', 'trader', 'vyapari'],
   salaried: ['salaried', 'salary employee', 'government employee', 'private employee'],
   student: ['student', 'school pupil', 'college student'],
   worker: ['construction worker', 'labourer', 'laborer', 'unorganised worker', 'unorganized worker'],
+  artisan: ['artisan', 'craftsperson', 'craftsman', 'craftswoman'],
+  artist: ['artist', 'musician', 'performer', 'sculptor', 'painter'],
+  weaver: ['weaver', 'powerloom worker', 'powerloom weaver'],
+  tapper: ['tapper', 'rubber tapper', 'toddy tapper'],
+  fisherman: ['fisherman', 'fisherwoman', 'fisherfolk', 'fish worker'],
+  researcher: ['scientist', 'researcher'],
 };
 
 const northEasternStates = new Set([
@@ -214,7 +219,7 @@ function getOccupationStatus(profileOccupation, criteria) {
     .join('|');
   const explicitRequirement = occupationCriteria.some(({ text }) => {
     return new RegExp(
-      `\\b(?:applicant|beneficiary|candidate|person|individual)\\b.{0,80}\\b(?:must|should|shall)\\b.{0,50}\\b(?:be|work as|engaged in|employed as)\\s+(?:an?\\s+)?(?:${roleTerms})\\b|\\b(?:must|should|shall)\\s+be\\s+(?:an?\\s+)?(?:${roleTerms})\\b`,
+      `^\\s*(?:the\\s+)?(?:${roleTerms})s?\\b|\\b(?:applicant|beneficiary|candidate|person|individual)\\b.{0,100}\\b(?:must|should|shall|can|eligible|will be eligible)\\b.{0,60}\\b(?:${roleTerms})s?\\b|\\b(?:must|should|shall|can)\\s+be\\s+(?:an?\\s+)?(?:${roleTerms})s?\\b`,
       'i',
     ).test(text);
   });
@@ -222,7 +227,7 @@ function getOccupationStatus(profileOccupation, criteria) {
 }
 
 function hasAffirmativeRequirement(text) {
-  return /\b(?:must|should|shall)(?!\s+not)\b|\b(?:required to|is required to|are required to|eligible only|only eligible|is eligible|are eligible|entitled to)\b/i.test(text);
+  return /\b(?:must|should|shall)(?!\s+not)\b|\b(?:has|possesses|holds|required to|is required to|are required to|eligible only|only eligible|is eligible|are eligible|will be eligible|can be eligible|can be|only available|applicable to|applicable for|entitled to|mandatory)\b/i.test(text);
 }
 
 function hasRequiredSpecialStatus(criteria, profile) {
@@ -231,10 +236,10 @@ function hasRequiredSpecialStatus(criteria, profile) {
     if (!hasAffirmativeRequirement(text)) continue;
 
     const hasApplicant = /\b(?:applicant|beneficiary|candidate|person|individual)\b/i.test(text);
-    const disabilityMention = /\b(?:differently[- ]abled|person with disabilit|disabled|disabilit(?:y|ies)|hearing[- ]and[- ]speech[- ]impaired)\b/i.test(text);
+    const disabilityMention = /\b(?:differently[- ]abled|person with disabilit|disabled|disabilit(?:y|ies)|blind|visually impaired|hearing[- ]impaired|deaf|hearing[- ]and[- ]speech[- ]impaired)\b/i.test(text);
     const disabilityRequirement = hasApplicant
       && disabilityMention
-      && /\b(?:applicant|beneficiary|candidate|person|individual)\b[^.]{0,100}\b(?:must|should|shall)(?!\s+not)\b[^.]{0,100}\b(?:differently[- ]abled|person with disabilit|disabled|disabilit(?:y|ies)|hearing[- ]and[- ]speech[- ]impaired)\b/i.test(text);
+      && /\b(?:applicant|beneficiary|candidate|person|individual)\b[^.]{0,100}\b(?:must|should|shall)(?!\s+not)\b[^.]{0,100}\b(?:differently[- ]abled|person with disabilit|disabled|disabilit(?:y|ies)|blind|visually impaired|hearing[- ]impaired|deaf|hearing[- ]and[- ]speech[- ]impaired)\b/i.test(text);
     if (
       disabilityRequirement
       && !profile.isDifferentlyAbled
@@ -255,11 +260,111 @@ function hasRequiredSpecialStatus(criteria, profile) {
   return false;
 }
 
+function hasUnverifiableRequiredCondition(scheme, criteria, profile) {
+  const educationKnown = Boolean(profile.education || profile.educationLevel || profile.qualification);
+  const occupation = String(profile.occupation || '').toLowerCase();
+  const schemeName = String(scheme.name || '').toLowerCase();
+  const gender = String(profile.gender || '').toLowerCase();
+  const isFemale = /\b(?:female|woman|women)\b/.test(gender);
+  if (/\bunemployed\b/.test(schemeName) && occupation && !/\bunemploy|jobless\b/.test(occupation)) return true;
+  if (/\b(?:student|scholar)\b/.test(schemeName) && occupation && !/\b(?:student|scholar)\b/.test(occupation)) return true;
+  if (/\b(?:mahila|women|woman|female|girl)\b/.test(schemeName) && !isFemale) return true;
+  if (/\b(?:maternity|pregnan|bride)\b/i.test(schemeName) && !profile.isPregnant && !profile.maritalStatus) return true;
+  if (/\b(?:blind|visually impaired|hearing impaired|deaf|differently abled|disabilit)\b/.test(schemeName) && !profile.isDifferentlyAbled) return true;
+  if (/\b(?:widow|widowed)\b/.test(schemeName) && !profile.isWidow && !profile.motherWidowed) return true;
+  if (/\b(?:destitute|deserted|divorced|single mother)\b/i.test(schemeName) && !profile.isDestitute && !profile.maritalStatus) return true;
+  if (/\b(?:bpl|below poverty line|landless|digitally illiterate|illiterate household)\b/i.test(schemeName)
+    && !profile.bpl && !profile.landless && !profile.digitalLiteracy) return true;
+
+  for (const criterion of criteria) {
+    const text = criterion.text;
+    if (!hasAffirmativeRequirement(text)) continue;
+
+    if (
+      !educationKnown
+      && /\b(?:pass(?:ed)?|class|standard|grade|degree|graduates?|undergraduates?|post[- ]?graduates?|ph\.?d|student|enrolled|studying|school|qualif(?:ication|y)|educational|diploma|final[- ]year)\b/i.test(text)
+    ) return true;
+    if (/\b(?:bpl|below poverty line)\b/i.test(text) && !profile.bpl) return true;
+    if (/\b(?:landless|landless household)\b/i.test(text) && !profile.landless) return true;
+    if (/\b(?:digitally illiterate|digital literacy)\b/i.test(text) && !profile.digitalLiteracy) return true;
+    if (/\b(?:employed more than|minimum of \d+ employees|at least \d+ employees|employee strength|unit should have employed)\b/i.test(text) && !profile.enterpriseEmployees) return true;
+    if (/\bdestitute\b/i.test(text) && !profile.isDestitute) return true;
+    if (/\b(?:legally divorced|deserted for|deserted wife|single mother)\b/i.test(text) && !profile.maritalStatus) return true;
+    if (/\b(?:farmer|grower|cultivator|agricultural labourer|agricultural laborer)\b/i.test(text)
+      && !/\b(?:farmer|agricultur|cultivat|grower)\b/i.test(occupation)) return true;
+    if (/\b(?:nuts-bearing palms|coconut palms|healthy .* palms)\b/i.test(text) && !profile.hasCoconutPalms) return true;
+    if (/\b(?:landholding|land ownership|landowner|agricultural land)\b/i.test(text) && !profile.landOwnership) return true;
+    if (/\b(?:project for the production|projects for the production|manufacturing unit|production of coir)\b/i.test(text)
+      && !profile.enterpriseActivity) return true;
+    if (/\b(?:micro and small enterprises?|micro, small, and medium enterprises?|micro manufacturing enterprises?|small and medium enterprises?|msmes?)\b/i.test(text)
+      && !profile.enterpriseActivity && !/\b(?:entrepreneur|business owner|self[- ]employed)\b/i.test(occupation)) return true;
+    if (/\b(?:pregnant|pregnancy|expectant mother|maternity)\b/i.test(text) && !profile.isPregnant) return true;
+    if (/\b(?:group applying|group production|as members|members of the group)\b/i.test(text) && !profile.groupMembership) return true;
+    if (/\bmember of (?:an? )?(?:employees? cooperative|cooperative|self[- ]help|producer|registered)\b/i.test(text)
+      && !profile.memberships?.length) return true;
+    if (/\b(?:university|institution)\b.{0,100}\b(?:eligible to apply|could be|should be|must be)\b/i.test(text)
+      && !profile.isInstitution) return true;
+    if (/\b(?:tribal communities|scheduled tribe|st)\b/i.test(text)
+      && !['st', 'scheduled tribe'].includes(String(profile.socialCategory || '').toLowerCase())) return true;
+    if (/\badi dravidar\b/i.test(text)
+      && !['sc', 'scheduled caste'].includes(String(profile.socialCategory || '').toLowerCase())) return true;
+    if (/\b(?:individual homes?|residential flats?|homeowners?|house owner)\b/i.test(text) && !profile.ownsHome) return true;
+    if (/\b(?:applicable to|reserved for|only for)\s+(?:women|woman|female|girls?)\b/i.test(text)
+      && !isFemale) return true;
+    if (/\bparsi\b/i.test(text)
+      && !/\bparsi\b/i.test(String(profile.religion || ''))) return true;
+    if (/\b(?:rural area|rural resident|residing in a rural)\b/i.test(text) && !profile.isRuralResident) return true;
+    if (/\b(?:bank account|bank\s*\/\s*post office account|aadhaar linked bank account)\b/i.test(text) && !profile.hasBankAccount) return true;
+    if (/\b(?:lpg user|lpg connection)\b/i.test(text) && !profile.hasLpgConnection) return true;
+    if (/\b(?:overseas indian|emigration clearance|cleared emigration)\b/i.test(text) && !profile.isOverseasIndian) return true;
+    if (/\b(?:prior experience|work experience|previous experience)\b/i.test(text) && !profile.workExperience) return true;
+    if (/\b(?:award|awards|fellowship|prize)\b/i.test(schemeName) && !profile.achievements?.length) return true;
+
+    if (
+      !profile.gender
+      && /\b(?:bride|wife|husband|widow|widower|women?|female|girl|daughter|son|male|men|boy)\b/i.test(text)
+      && /\b(?:applicant|beneficiary|candidate|person|individual|bride|wife|husband|widow|widower)\b/i.test(text)
+    ) return true;
+
+    if (
+      !profile.isDifferentlyAbled
+      && /\b(?:blind|visually impaired|hearing[- ]impaired|deaf|disabilit|differently[- ]abled)\b/i.test(text)
+      && /\b(?:must|should|shall|only|eligible|beneficiary|applicant)\b/i.test(text)
+    ) return true;
+
+    if (
+      !/\bunemploy|jobless|not employed|not in regular service|not be in regular service\b/i.test(occupation)
+      && /\b(?:only\s+)?unemployed\b/i.test(text)
+    ) return true;
+    if (
+      /\b(?:employed|software|engineer|teacher|worker|farmer|business|self[- ]employed|salaried|service)\b/i.test(occupation)
+      && /\b(?:unemployed|not employed|not in regular service|not be in regular service|not be employed|not engaged in full[- ]time employment)\b/i.test(text)
+    ) return true;
+    if (
+      /\b(?:student|studying|enrolled)\b/i.test(occupation)
+      && /\b(?:not be engaged in full[- ]time education|not engaged in full[- ]time education|not a student)\b/i.test(text)
+    ) return true;
+
+    const relationshipPrerequisite = /\b(?:applicant|beneficiary|candidate|person|individual)\b[^.]{0,100}\b(?:must|should|shall)(?!\s+not)\b[^.]{0,100}\b(?:bride|wife|husband|widow|widower|daughter|son|legal heir|family member|newly married|married couple)\b/i.test(text)
+      || /\b(?:bride|wife|husband|widow|widower|daughter|son|legal heir|newly married|married couple)\b[^.]{0,100}\b(?:applicant|beneficiary|candidate|person|individual)\b/i.test(text);
+    if (
+      !profile.isWidow
+      && !profile.maritalStatus
+      && relationshipPrerequisite
+    ) return true;
+
+    const eventPrerequisite = /\b(?:applicant|beneficiary|candidate|person|individual|family|breadwinner)\b[^.]{0,100}\b(?:must|should|shall)(?!\s+not)\b[^.]{0,150}\b(?:returned|affected|victim|displaced|missing|married|lost|death|died|disaster|calamity|outbreak|accident)\b/i.test(text)
+      || /\b(?:death|died|accident|outbreak|disaster|calamity|newly married|time of marriage|missing person)\b/i.test(text);
+    if (eventPrerequisite && !profile.eventEligibility) return true;
+  }
+
+  return false;
+}
+
 function hasRequiredOccupationMismatch(profileOccupation, criteria) {
   const profile = String(profileOccupation || '').toLowerCase();
   for (const criterion of criteria) {
     const text = criterion.text;
-    if (!criterion.types.includes('occupation_or_profession') || !hasAffirmativeRequirement(text)) continue;
 
     const requiredGroups = Object.entries(occupationTerms)
       .filter(([, terms]) => terms.some((term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}s?\\b`, 'i').test(text)))
@@ -269,7 +374,17 @@ function hasRequiredOccupationMismatch(profileOccupation, criteria) {
     const profileGroups = Object.entries(occupationTerms)
       .filter(([, terms]) => terms.some((term) => profile.includes(term)))
       .map(([group]) => group);
-    if (!profileGroups.some((group) => requiredGroups.includes(group))) return true;
+    if (profileGroups.some((group) => requiredGroups.includes(group))) continue;
+
+    const roleTerms = Object.values(occupationTerms)
+      .flat()
+      .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    const directlyTargetsOccupation = new RegExp(
+      `^\\s*(?:the\\s+)?(?:${roleTerms})s?\\b|\\bfor\\s+(?:an?\\s+)?(?:${roleTerms})s?\\b|\\b(?:applicant|beneficiary|candidate|person|individual)\\b.{0,100}\\b(?:must|should|shall|can|eligible|will be eligible)\\b.{0,60}\\b(?:${roleTerms})s?\\b|\\b(?:applicant|beneficiary|candidate|person|individual)\\b.{0,80}\\b(?:${roleTerms})s?\\b.{0,120}\\b(?:must|should|shall|eligible|will be eligible|applicable)\\b|\\b(?:${roleTerms})s?\\b.{0,160}\\b(?:must|should|shall|eligible|will be eligible|offering at least)\\b|\\b(?:must|should|shall|can)\\s+be\\s+(?:an?\\s+)?(?:${roleTerms})s?\\b`,
+      'i',
+    ).test(text);
+    if (directlyTargetsOccupation) return true;
   }
 
   return false;
@@ -278,9 +393,15 @@ function hasRequiredOccupationMismatch(profileOccupation, criteria) {
 function assessScheme(scheme, profile) {
   const criteria = getEligibilityCriteria(scheme);
   const criteriaText = criteria.map(({ text }) => text).join(' ');
+  const profileStateName = String(profile.state || '').toLowerCase();
+  if (
+    /\bnorth[\s-]?eastern region\b/i.test(scheme.name || '')
+    && !northEasternStates.has(profileStateName)
+  ) return null;
   if (
     hasRequiredSpecialStatus(criteria, profile)
-    || hasRequiredOccupationMismatch(profile.occupation, criteria)
+    || hasUnverifiableRequiredCondition(scheme, criteria, profile)
+    || hasRequiredOccupationMismatch(profile.occupation, [...criteria, { text: scheme.name, values: {}, types: [] }])
   ) return null;
 
   const age = Number(profile.age);
@@ -318,11 +439,11 @@ function assessScheme(scheme, profile) {
   const mentionedJurisdictions = knownJurisdictions.filter((jurisdiction) => content.includes(` ${jurisdiction} `));
   const profileState = String(profile.state || '').toLowerCase();
   if (
-    scheme.level === 'State'
-    && profileState
+    profileState
     && mentionedJurisdictions.length > 0
     && !mentionedJurisdictions.includes(profileState)
   ) return null;
+  if (scheme.level === 'State' && (!profileState || !mentionedJurisdictions.includes(profileState))) return null;
 
   const occupationCategories = {
     agriculture: ['agriculture-rural-environment'],
@@ -344,18 +465,23 @@ function assessScheme(scheme, profile) {
       ? 'match'
       : 'unknown';
   const profileFactors = [
-    { known: hasAge, status: ageStatus },
-    { known: incomeRange !== null, status: incomeStatus },
-    { known: Boolean(profile.socialCategory), status: categoryStatus },
-    { known: Boolean(profile.occupation), status: occupationStatus },
-    { known: scheme.level === 'State' && Boolean(profileState), status: locationStatus },
-  ].filter((factor) => factor.known);
+    { applicable: ageBounds.length > 0 && hasAge, status: ageStatus },
+    { applicable: incomeBounds.length > 0 && incomeRange !== null, status: incomeStatus },
+    { applicable: Boolean(profile.socialCategory) && categoryStatus !== 'unknown', status: categoryStatus },
+    { applicable: Boolean(profile.occupation) && occupationStatus !== 'unknown', status: occupationStatus },
+    { applicable: scheme.level === 'State' || mentionedJurisdictions.length > 0, status: locationStatus },
+  ].filter((factor) => factor.applicable);
+  const hasConcreteProfileMatch = [ageStatus, incomeStatus, categoryStatus, occupationStatus]
+    .some((status) => status === 'match');
+  if (!hasConcreteProfileMatch) return null;
   const matchPoints = profileFactors.reduce((total, { status }) => (
     total + (status === 'match' ? 1 : status === 'partial' ? 0.5 : 0)
   ), 0);
+  if (!profileFactors.length || matchPoints === 0) return null;
   const matchScore = profileFactors.length
     ? Math.round((matchPoints / profileFactors.length) * 100)
     : 0;
+  if (matchScore < 60) return null;
   const matchReasons = [
     locationStatus === 'match'
       ? { label: scheme.level === 'Central' ? 'This is listed as a Central Government scheme.' : `The scheme lists ${profile.state} as an applicable jurisdiction.`, status: 'match' }

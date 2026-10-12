@@ -63,6 +63,24 @@ export function getDashboardData() {
   return request('/dashboard');
 }
 
+export function getApplicationsApi() {
+  return request('/applications');
+}
+
+export function createApplicationApi(application) {
+  return request('/applications', {
+    method: 'POST',
+    body: JSON.stringify(application),
+  });
+}
+
+export function updateApplicationBenefitApi(schemeId, benefitReceived) {
+  return request(`/applications/${encodeURIComponent(schemeId)}/benefit`, {
+    method: 'PATCH',
+    body: JSON.stringify({ benefitReceived }),
+  });
+}
+
 export function getRecommendedSchemes() {
   return request('/schemes/recommend');
 }
